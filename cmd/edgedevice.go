@@ -18,19 +18,20 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:   "device",
-	Short: "Adds a new edgedevice resource",
-	Long: `Adds a new edgedevice resource`,
+// edgedeviceCmd represents the edgedevice command
+var edgedeviceCmd = &cobra.Command{
+	Use:   "edgedevice",
+	Short: "Adds a new edgedevice",
+	Long: `Adds a new edgedevice"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add device called")
+		fmt.Println("edgedevice called")
 	},
 }
 
 func init() {
-	addCmd.AddCommand(deviceCmd)
+	addCmd.AddCommand(edgedeviceCmd)
 }
