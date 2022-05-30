@@ -10,13 +10,13 @@ This repo has the developer CLI for [project-flotta.io](https://github.com/proje
 
 ### Build
 
-Build the project by running: `go build .`
+Build the project by running: `make build`
 
 ## Usage
 
 Use the developer CLI commands by running: 
 
-`./flotta-dev-cli <command> <subcommand>`
+`./bin/flotta <command> <subcommand>`
 
 For example:
-`./flotta-dev-cli add edgedevice`
+`./bin/flotta add edgedevice`
