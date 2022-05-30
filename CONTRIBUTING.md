@@ -9,7 +9,7 @@
 
 ### Build
 
-Build the project by running: `go build .`
+Build the project by running: `make build`
 
 ## Contribute
 
@@ -24,4 +24,4 @@ Build the project by running: `go build .`
   This will create a new file named `<subcommand name>.go` inside the `cmd` directory.
 
 ### Apply the changes
-Once you have finished editing the new file, re-build the project: `go build .`.
+Once you have finished editing the new file, re-build the project: `make build`.

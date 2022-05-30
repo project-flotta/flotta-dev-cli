@@ -14,19 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cmd
+package commands
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
-// addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add a new flotta resource",
-	Long: `Use the add command to add a flotta resource, such as edgedevice, edgeworkload or edgedeviceset`,
+// edgedeviceCmd represents the edgedevice command
+var edgedeviceCmd = &cobra.Command{
+	Use:   "edgedevice",
+	Short: "Adds a new edgedevice",
+	Long: `Adds a new edgedevice"`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("edgedevice called")
+	},
 }
 
 func init() {
-	rootCmd.AddCommand(addCmd)
+	addCmd.AddCommand(edgedeviceCmd)
 }
