@@ -18,6 +18,7 @@ package add
 
 import (
 	"fmt"
+	"github.com/arielireni/flotta-dev-cli/internal/resources"
 	"github.com/spf13/cobra"
 )
 
@@ -27,7 +28,22 @@ var edgedeviceCmd = &cobra.Command{
 	Short: "Adds a new edgedevice",
 	Long: `Adds a new edgedevice"`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("edgedevice called")
+		client, err := resources.NewClient()
+		if err != nil {
+			fmt.Printf("NewClient failed: %v\n", err)
+		}
+
+		device, err := resources.NewEdgeDevice(client, args[0])
+		if err != nil {
+			fmt.Printf("NewEdgeDevice failed: %v\n", err)
+		}
+
+		err = device.Register()
+		if err != nil {
+			fmt.Printf("Register failed: %v\n", err)
+		}
+
+		fmt.Printf("Edgedevice: %v was added \n", device.GetId())
 	},
 }
 
