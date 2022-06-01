@@ -15,8 +15,12 @@ limitations under the License.
 */
 package main
 
-import "github.com/arielireni/flotta-dev-cli/commands"
+import (
+	"github.com/arielireni/flotta-dev-cli/internal/cmd"
+	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/add"
+	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/delete"
+)
 
 func main() {
-	commands.Execute()
+	cmd.Execute()
 }

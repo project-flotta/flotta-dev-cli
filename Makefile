@@ -1,6 +1,6 @@
 ##@ Build
 
-build:
+build: generate-tools
 	go build -mod=vendor -o bin/flotta main.go
 
 ##@ Development
