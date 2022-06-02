@@ -20,3 +20,10 @@ Use the developer CLI commands by running:
 
 For example:
 `./bin/flotta add edgedevice`
+
+Available Commands:
+- `help`
+- `add edgedevice`
+- `delete edgedevice`
+- `start edgedevice`
+- `stop edgedevice`

@@ -31,16 +31,19 @@ var edgedeviceCmd = &cobra.Command{
 		client, err := resources.NewClient()
 		if err != nil {
 			fmt.Printf("NewClient failed: %v\n", err)
+			return
 		}
 
 		device, err := resources.NewEdgeDevice(client, args[0])
 		if err != nil {
 			fmt.Printf("NewEdgeDevice failed: %v\n", err)
+			return
 		}
 
 		err = device.Register()
 		if err != nil {
 			fmt.Printf("Register failed: %v\n", err)
+			return
 		}
 
 		fmt.Printf("edgedevice '%v' was added \n", device.GetName())

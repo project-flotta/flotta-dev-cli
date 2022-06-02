@@ -13,16 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+
+package stop
 
 import (
 	"github.com/arielireni/flotta-dev-cli/internal/cmd"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/add"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/delete"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/start"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/stop"
+
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	cmd.Execute()
+// stopCmd represents the stop command
+var stopCmd = &cobra.Command{
+	Use:   "stop",
+	Short: "Stop a flotta resource",
+	Long: `Use the stop command to stop a flotta resource, such as edgedevice, edgeworkload or edgedeviceset`,
+}
+
+func init() {
+	cmd.RootCmd.AddCommand(stopCmd)
 }
