@@ -7,7 +7,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/archive"
-	"github.com/google/uuid"
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/generated/clientset/versioned"
 	managementv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
@@ -42,7 +41,6 @@ const (
 )
 
 type EdgeDevice interface {
-	GetId() string
 	GetName() string
 	Register(cmds ...string) error
 	Unregister() error
@@ -55,7 +53,6 @@ type edgeDevice struct {
 	device    managementv1alpha1.ManagementV1alpha1Interface
 	client       *client.Client
 	name      string
-	machineId string
 }
 
 func NewEdgeDevice(fclient managementv1alpha1.ManagementV1alpha1Interface, deviceName string) (EdgeDevice, error) {
@@ -64,12 +61,7 @@ func NewEdgeDevice(fclient managementv1alpha1.ManagementV1alpha1Interface, devic
 		return nil, err
 	}
 
-	machineId := uuid.NewString()
-	return &edgeDevice{device: fclient, client: client, name: deviceName, machineId: machineId}, nil
-}
-
-func (e *edgeDevice) GetId() string {
-	return e.machineId
+	return &edgeDevice{device: fclient, client: client, name: deviceName}, nil
 }
 
 func (e *edgeDevice) GetName() string {
@@ -97,7 +89,7 @@ func (e *edgeDevice) Register(cmds ...string) error {
 		}
 	}
 
-	if _, err = e.Exec(fmt.Sprintf("echo 'client-id = \"%v\"' >> /etc/yggdrasil/config.toml", e.machineId)); err != nil {
+	if _, err = e.Exec(fmt.Sprintf("echo 'client-id = \"%v\"' >> /etc/yggdrasil/config.toml", e.name)); err != nil {
 		return err
 	}
 
@@ -134,7 +126,7 @@ func (e *edgeDevice) Register(cmds ...string) error {
 }
 
 func (e *edgeDevice) Unregister() error {
-	err := e.device.EdgeDevices(Namespace).Delete(context.TODO(), e.machineId, metav1.DeleteOptions{})
+	err := e.device.EdgeDevices(Namespace).Delete(context.TODO(), e.name, metav1.DeleteOptions{})
 	if err != nil {
 		return err
 	}
@@ -148,7 +140,7 @@ func (e *edgeDevice) Unregister() error {
 }
 
 func (e *edgeDevice) Get() (*v1alpha1.EdgeDevice, error) {
-	device, err := e.device.EdgeDevices(Namespace).Get(context.TODO(), e.machineId, metav1.GetOptions{})
+	device, err := e.device.EdgeDevices(Namespace).Get(context.TODO(), e.name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -222,7 +214,7 @@ func (e *edgeDevice) waitForDevice(cond func() bool) error {
 		}
 	}
 
-	return fmt.Errorf("error waiting for edgedevice %v[%v]", e.name, e.machineId)
+	return fmt.Errorf("error waiting for edgedevice %v[%v]", e.name, e.name)
 }
 
 
