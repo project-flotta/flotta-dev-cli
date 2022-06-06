@@ -1,4 +1,4 @@
-package delete
+package start
 
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
@@ -18,9 +18,9 @@ limitations under the License.
 
 
 import (
-"fmt"
-"github.com/arielireni/flotta-dev-cli/internal/resources"
-"github.com/spf13/cobra"
+	"fmt"
+	"github.com/arielireni/flotta-dev-cli/internal/resources"
+	"github.com/spf13/cobra"
 )
 
 // edgedeviceCmd represents the edgedevice command
@@ -41,23 +41,17 @@ var edgedeviceCmd = &cobra.Command{
 			return
 		}
 
-		err = device.Unregister()
+		err = device.Start()
 		if err != nil {
-			fmt.Printf("Unregister failed: %v\n", err)
+			fmt.Printf("Start failed: %v\n", err)
 			return
 		}
 
-		err = device.Remove()
-		if err != nil {
-			fmt.Printf("Remove failed: %v\n", err)
-			return
-		}
-
-		fmt.Printf("edgedevice '%v' was deleted \n", device.GetName())
+		fmt.Printf("edgedevice '%v' was started \n", device.GetName())
 	},
 }
 
 func init() {
-	// subcommand of delete
-	deleteCmd.AddCommand(edgedeviceCmd)
+	// subcommand of start
+	startCmd.AddCommand(edgedeviceCmd)
 }

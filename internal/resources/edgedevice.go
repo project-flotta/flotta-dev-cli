@@ -47,6 +47,7 @@ type EdgeDevice interface {
 	Get() (*v1alpha1.EdgeDevice, error)
 	Remove() error
 	Stop() error
+	Start() error
 }
 
 type edgeDevice struct {
@@ -151,6 +152,10 @@ func (e *edgeDevice) Get() (*v1alpha1.EdgeDevice, error) {
 func (e *edgeDevice) Stop() error {
 	timeout := time.Duration(waitTimeout)
 	return e.client.ContainerStop(context.TODO(), e.name, &timeout)
+}
+
+func (e *edgeDevice) Start() error {
+	return e.client.ContainerStart(context.TODO(), e.name, types.ContainerStartOptions{})
 }
 
 func (e *edgeDevice) Remove() error {
