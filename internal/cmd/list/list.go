@@ -13,17 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+
+package list
 
 import (
 	"github.com/arielireni/flotta-dev-cli/internal/cmd"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/add"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/delete"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/list"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/start"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/stop"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	cmd.Execute()
+// listCmd represents the list command
+var listCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list flotta resources",
+	Long: `Use the list command to list all the flotta resources who match the specified type.`,
+}
+
+func init() {
+	cmd.RootCmd.AddCommand(listCmd)
 }
