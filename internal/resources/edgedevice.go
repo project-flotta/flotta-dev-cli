@@ -75,7 +75,7 @@ func (e *edgeDevice) Register(cmds ...string) error {
 		image = name
 	}
 	ctx := context.Background()
-	resp, err := e.client.ContainerCreate(ctx, &container.Config{Image: image}, &container.HostConfig{Privileged: true, ExtraHosts: []string{"project-flotta.io:172.17.0.1"}}, nil, nil, e.name)
+	resp, err := e.client.ContainerCreate(ctx, &container.Config{Image: image, Labels: map[string]string{"flotta":"true"}}, &container.HostConfig{Privileged: true, ExtraHosts: []string{"project-flotta.io:172.17.0.1"}}, nil, nil, e.name)
 	if err != nil {
 		return err
 	}
