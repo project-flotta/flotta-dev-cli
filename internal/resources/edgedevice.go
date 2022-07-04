@@ -48,12 +48,13 @@ type EdgeDevice interface {
 	Remove() error
 	Stop() error
 	Start() error
+	WaitForWorkloadState(string, v1alpha1.EdgeWorkloadPhase) error
 }
 
 type edgeDevice struct {
-	device    managementv1alpha1.ManagementV1alpha1Interface
-	client       *client.Client
-	name      string
+	device managementv1alpha1.ManagementV1alpha1Interface
+	client *client.Client
+	name   string
 }
 
 func NewEdgeDevice(fclient managementv1alpha1.ManagementV1alpha1Interface, deviceName string) (EdgeDevice, error) {
@@ -75,7 +76,7 @@ func (e *edgeDevice) Register(cmds ...string) error {
 		image = name
 	}
 	ctx := context.Background()
-	resp, err := e.client.ContainerCreate(ctx, &container.Config{Image: image, Labels: map[string]string{"flotta":"true"}}, &container.HostConfig{Privileged: true, ExtraHosts: []string{"project-flotta.io:172.17.0.1"}}, nil, nil, e.name)
+	resp, err := e.client.ContainerCreate(ctx, &container.Config{Image: image, Labels: map[string]string{"flotta": "true"}}, &container.HostConfig{Privileged: true, ExtraHosts: []string{"project-flotta.io:172.17.0.1"}}, nil, nil, e.name)
 	if err != nil {
 		return err
 	}
@@ -222,6 +223,25 @@ func (e *edgeDevice) waitForDevice(cond func() bool) error {
 	return fmt.Errorf("error waiting for edgedevice %v[%v]", e.name, e.name)
 }
 
+func (e *edgeDevice) WaitForWorkloadState(workloadName string, workloadPhase v1alpha1.EdgeWorkloadPhase) error {
+	return e.waitForDevice(func() bool {
+		device, err := e.Get()
+		if device == nil || err != nil {
+			return false
+		}
+
+		if len(device.Status.Workloads) == 0 {
+			return false
+		}
+		workloads := device.Status.Workloads
+		for _, workload := range workloads {
+			if workload.Name == workloadName && workload.Phase == workloadPhase {
+				return true
+			}
+		}
+		return false
+	})
+}
 
 func NewClient() (managementv1alpha1.ManagementV1alpha1Interface, error) {
 	homedir, err := os.UserHomeDir()
