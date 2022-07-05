@@ -42,6 +42,9 @@ var edgedeviceCmd = &cobra.Command{
 
 		err = device.Register()
 		if err != nil {
+			// if device.Register() failed, remove the container
+			device.Remove()
+
 			fmt.Printf("Register failed: %v\n", err)
 			return
 		}
