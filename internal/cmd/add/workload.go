@@ -18,7 +18,7 @@ package add
 
 import (
 	"fmt"
-	"github.com/arielireni/flotta-dev-cli/internal/resources"
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"github.com/spf13/cobra"
 	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 	"math/rand"

@@ -17,7 +17,7 @@ limitations under the License.
 package stop
 
 import (
-	"github.com/arielireni/flotta-dev-cli/internal/cmd"
+	"github.com/project-flotta/flotta-dev-cli/internal/cmd"
 
 	"github.com/spf13/cobra"
 )
