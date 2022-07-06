@@ -30,11 +30,11 @@ import (
 	"time"
 )
 
-// edgedeviceCmd represents the edgedevice command
-var edgedeviceCmd = &cobra.Command{
-	Use:   "edgedevice",
-	Short: "Adds a new edgedevice",
-	Long:  `Adds a new edgedevice"`,
+// deviceCmd represents the device command
+var deviceCmd = &cobra.Command{
+	Use:   "device",
+	Short: "list device",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -75,5 +75,5 @@ var edgedeviceCmd = &cobra.Command{
 
 func init() {
 	// subcommand of list
-	listCmd.AddCommand(edgedeviceCmd)
+	listCmd.AddCommand(deviceCmd)
 }

@@ -1,5 +1,3 @@
-package delete
-
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
@@ -16,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+package add
 
 import (
 	"fmt"
@@ -23,10 +22,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// edgeworkloadCmd represents the edgeworkload command
-var edgeworkloadCmd = &cobra.Command{
-	Use:   "edgeworkload",
-	Short: "Delete edgeworkload",
+// deviceCmd represents the device command
+var deviceCmd = &cobra.Command{
+	Use:   "device",
+	Short: "Adds a new device",
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
@@ -35,23 +34,26 @@ var edgeworkloadCmd = &cobra.Command{
 			return
 		}
 
-		workload, err := resources.NewEdgeWorkload(client)
+		device, err := resources.NewEdgeDevice(client, args[0])
 		if err != nil {
-			fmt.Printf("NewEdgeWorkload failed: %v\n", err)
+			fmt.Printf("NewEdgeDevice failed: %v\n", err)
 			return
 		}
 
-		err = workload.Remove(args[0])
+		err = device.Register()
 		if err != nil {
-			fmt.Printf("Remove workload failed: %v\n", err)
+			// if device.Register() failed, remove the container
+			device.Remove()
+
+			fmt.Printf("Register failed: %v\n", err)
 			return
 		}
 
-		fmt.Printf("workload '%v' was deleted \n", args[0])
+		fmt.Printf("device '%v' was added \n", device.GetName())
 	},
 }
 
 func init() {
-	// subcommand of delete
-	deleteCmd.AddCommand(edgeworkloadCmd)
+	// subcommand of add
+	addCmd.AddCommand(deviceCmd)
 }

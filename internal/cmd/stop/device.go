@@ -1,3 +1,5 @@
+package stop
+
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 
@@ -14,7 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package add
 
 import (
 	"fmt"
@@ -22,11 +23,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// edgedeviceCmd represents the edgedevice command
-var edgedeviceCmd = &cobra.Command{
-	Use:   "edgedevice",
-	Short: "Adds a new edgedevice",
-	Long: `Adds a new edgedevice"`,
+// deviceCmd represents the device command
+var deviceCmd = &cobra.Command{
+	Use:   "device",
+	Short: "stops a device",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -40,20 +41,17 @@ var edgedeviceCmd = &cobra.Command{
 			return
 		}
 
-		err = device.Register()
+		err = device.Stop()
 		if err != nil {
-			// if device.Register() failed, remove the container
-			device.Remove()
-
-			fmt.Printf("Register failed: %v\n", err)
+			fmt.Printf("Stop failed: %v\n", err)
 			return
 		}
 
-		fmt.Printf("edgedevice '%v' was added \n", device.GetName())
+		fmt.Printf("edgedevice '%v' was stopped \n", device.GetName())
 	},
 }
 
 func init() {
-	// subcommand of add
-	addCmd.AddCommand(edgedeviceCmd)
+	// subcommand of stop
+	stopCmd.AddCommand(deviceCmd)
 }

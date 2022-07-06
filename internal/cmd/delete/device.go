@@ -1,4 +1,4 @@
-package stop
+package delete
 
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
@@ -18,16 +18,16 @@ limitations under the License.
 
 
 import (
-	"fmt"
-	"github.com/arielireni/flotta-dev-cli/internal/resources"
-	"github.com/spf13/cobra"
+"fmt"
+"github.com/arielireni/flotta-dev-cli/internal/resources"
+"github.com/spf13/cobra"
 )
 
-// edgedeviceCmd represents the edgedevice command
-var edgedeviceCmd = &cobra.Command{
-	Use:   "edgedevice",
-	Short: "Stops a container of existing edgedevice",
-	Long: `Stops a container of existing edgedevice"`,
+// deviceCmd represents the device command
+var deviceCmd = &cobra.Command{
+	Use:   "device",
+	Short: "Delete device",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -41,17 +41,23 @@ var edgedeviceCmd = &cobra.Command{
 			return
 		}
 
-		err = device.Stop()
+		err = device.Unregister()
 		if err != nil {
-			fmt.Printf("Stop failed: %v\n", err)
+			fmt.Printf("Unregister failed: %v\n", err)
 			return
 		}
 
-		fmt.Printf("edgedevice '%v' was stopped \n", device.GetName())
+		err = device.Remove()
+		if err != nil {
+			fmt.Printf("Remove failed: %v\n", err)
+			return
+		}
+
+		fmt.Printf("device '%v' was deleted \n", device.GetName())
 	},
 }
 
 func init() {
-	// subcommand of stop
-	stopCmd.AddCommand(edgedeviceCmd)
+	// subcommand of delete
+	deleteCmd.AddCommand(deviceCmd)
 }
