@@ -230,7 +230,7 @@ github.com/project-flotta/flotta-operator/api/v1alpha1
 github.com/project-flotta/flotta-operator/generated/clientset/versioned
 github.com/project-flotta/flotta-operator/generated/clientset/versioned/scheme
 github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1
-# github.com/prometheus/client_golang v1.11.0
+# github.com/prometheus/client_golang v1.11.1
 ## explicit; go 1.13
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/collectors
