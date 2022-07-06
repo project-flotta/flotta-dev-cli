@@ -19,7 +19,7 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
-	"github.com/arielireni/flotta-dev-cli/internal/resources"
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"

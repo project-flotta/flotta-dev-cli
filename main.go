@@ -16,12 +16,12 @@ limitations under the License.
 package main
 
 import (
-	"github.com/arielireni/flotta-dev-cli/internal/cmd"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/add"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/delete"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/list"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/start"
-	_ "github.com/arielireni/flotta-dev-cli/internal/cmd/stop"
+	"github.com/project-flotta/flotta-dev-cli/internal/cmd"
+	_ "github.com/project-flotta/flotta-dev-cli/internal/cmd/add"
+	_ "github.com/project-flotta/flotta-dev-cli/internal/cmd/delete"
+	_ "github.com/project-flotta/flotta-dev-cli/internal/cmd/list"
+	_ "github.com/project-flotta/flotta-dev-cli/internal/cmd/start"
+	_ "github.com/project-flotta/flotta-dev-cli/internal/cmd/stop"
 )
 
 func main() {
