@@ -1,6 +1,7 @@
 # Flotta Developer CLI
 
 This repo has the developer CLI for [project-flotta.io](https://github.com/project-flotta).
+The purpose of this cli is easily create edge devices and deploy prefefine workloads on.
 
 ## Installation
 
