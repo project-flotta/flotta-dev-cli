@@ -40,6 +40,7 @@ var (
 	workloadCmd = &cobra.Command{
 		Use:   "workload",
 		Short: "Adds a new workload",
+		Args: cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {
 				workloadImage = defaultImage
@@ -53,8 +54,10 @@ var (
 				return
 			}
 
-			if workloadName == "" {
+			if len(args) == 0 {
 				workloadName = normalizedImage + "-" + RandomSuffix()
+			} else {
+				workloadName = args[0]
 			}
 
 			client, err := resources.NewClient()
@@ -99,7 +102,6 @@ func init() {
 	// define command flags
 	workloadCmd.PersistentFlags().StringVarP(&deviceID, "device", "d", "", "device to run the container workload on")
 	workloadCmd.PersistentFlags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
-	workloadCmd.PersistentFlags().StringVarP(&workloadName, "name", "n", "", "name of the workload")
 
 	// mark device flag as required
 	workloadCmd.MarkPersistentFlagRequired("device")
