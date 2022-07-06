@@ -24,7 +24,7 @@ import (
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "list flotta resources",
+	Short: "List flotta resources",
 	Long: `Use the list command to list all the flotta resources who match the specified type.`,
 }
 
