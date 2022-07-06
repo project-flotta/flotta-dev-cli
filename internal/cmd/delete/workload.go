@@ -18,16 +18,16 @@ limitations under the License.
 
 
 import (
-"fmt"
-"github.com/arielireni/flotta-dev-cli/internal/resources"
-"github.com/spf13/cobra"
+	"fmt"
+	"github.com/arielireni/flotta-dev-cli/internal/resources"
+	"github.com/spf13/cobra"
 )
 
-// edgedeviceCmd represents the edgedevice command
-var edgedeviceCmd = &cobra.Command{
-	Use:   "edgedevice",
-	Short: "Delete edgedevice",
-	Long: `Deletes an edgedevice"`,
+// workloadCmd represents the workload command
+var workloadCmd = &cobra.Command{
+	Use:   "workload",
+	Short: "Delete workload",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -35,29 +35,23 @@ var edgedeviceCmd = &cobra.Command{
 			return
 		}
 
-		device, err := resources.NewEdgeDevice(client, args[0])
+		workload, err := resources.NewEdgeWorkload(client)
 		if err != nil {
-			fmt.Printf("NewEdgeDevice failed: %v\n", err)
+			fmt.Printf("NewEdgeWorkload failed: %v\n", err)
 			return
 		}
 
-		err = device.Unregister()
+		err = workload.Remove(args[0])
 		if err != nil {
-			fmt.Printf("Unregister failed: %v\n", err)
+			fmt.Printf("Remove workload failed: %v\n", err)
 			return
 		}
 
-		err = device.Remove()
-		if err != nil {
-			fmt.Printf("Remove failed: %v\n", err)
-			return
-		}
-
-		fmt.Printf("edgedevice '%v' was deleted \n", device.GetName())
+		fmt.Printf("workload '%v' was deleted \n", args[0])
 	},
 }
 
 func init() {
 	// subcommand of delete
-	deleteCmd.AddCommand(edgedeviceCmd)
+	deleteCmd.AddCommand(workloadCmd)
 }

@@ -23,11 +23,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// edgedeviceCmd represents the edgedevice command
-var edgedeviceCmd = &cobra.Command{
-	Use:   "edgedevice",
-	Short: "Adds a new edgedevice",
-	Long: `Adds a new edgedevice"`,
+// deviceCmd represents the device command
+var deviceCmd = &cobra.Command{
+	Use:   "device",
+	Short: "start device",
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -47,11 +47,11 @@ var edgedeviceCmd = &cobra.Command{
 			return
 		}
 
-		fmt.Printf("edgedevice '%v' was started \n", device.GetName())
+		fmt.Printf("device '%v' was started \n", device.GetName())
 	},
 }
 
 func init() {
 	// subcommand of start
-	startCmd.AddCommand(edgedeviceCmd)
+	startCmd.AddCommand(deviceCmd)
 }

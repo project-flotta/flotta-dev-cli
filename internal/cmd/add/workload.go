@@ -31,16 +31,15 @@ const (
 	defaultImage = "quay.io/project-flotta/nginx:1.21.6"
 )
 
-// edgeworkloadCmd represents the edgeworkload command
+// workloadCmd represents the workload command
 var (
 	deviceID      string
 	workloadImage string
 	workloadName  string
 
-	edgeworkloadCmd = &cobra.Command{
-		Use:   "edgeworkload",
-		Short: "Adds a new edgeworkload",
-		Long:  `Adds a new edgeworkload"`,
+	workloadCmd = &cobra.Command{
+		Use:   "workload",
+		Short: "Adds a new workload",
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {
 				workloadImage = defaultImage
@@ -88,22 +87,22 @@ var (
 				return
 			}
 
-			fmt.Printf("edgeworkload '%s' was added to device '%s'\n", workloadName, deviceID)
+			fmt.Printf("workload '%s' was added to device '%s'\n", workloadName, deviceID)
 		},
 	}
 )
 
 func init() {
 	// subcommand of add
-	addCmd.AddCommand(edgeworkloadCmd)
+	addCmd.AddCommand(workloadCmd)
 
 	// define command flags
-	edgeworkloadCmd.PersistentFlags().StringVarP(&deviceID, "device", "d", "", "device to run the container workload on")
-	edgeworkloadCmd.PersistentFlags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
-	edgeworkloadCmd.PersistentFlags().StringVarP(&workloadName, "name", "n", "", "name of the workload")
+	workloadCmd.PersistentFlags().StringVarP(&deviceID, "device", "d", "", "device to run the container workload on")
+	workloadCmd.PersistentFlags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
+	workloadCmd.PersistentFlags().StringVarP(&workloadName, "name", "n", "", "name of the workload")
 
 	// mark device flag as required
-	edgeworkloadCmd.MarkPersistentFlagRequired("device")
+	workloadCmd.MarkPersistentFlagRequired("device")
 }
 
 func RandomSuffix() string {
