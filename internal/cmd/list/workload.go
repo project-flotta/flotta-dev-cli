@@ -19,6 +19,7 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
+	"github.com/arielireni/flotta-dev-cli/internal/resources"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -30,10 +31,10 @@ import (
 	"time"
 )
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:   "device",
-	Short: "list devices",
+// workloadCmd represents the workload command
+var workloadCmd = &cobra.Command{
+	Use:   "workload",
+	Short: "list workloads",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -61,18 +62,56 @@ var deviceCmd = &cobra.Command{
 
 		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 
-		for _, container := range containers {
-			containerName := container.Names[0][1:]
-			createdAt := time.Unix(container.Created, 0)
-			runningFor := units.HumanDuration(time.Now().UTC().Sub(createdAt)) + " ago"
-
-			fmt.Fprintf(writer, "%s\t%v\t%s\t\n", containerName, container.State, runningFor)
+		client, err := resources.NewClient()
+		if err != nil {
+			fmt.Printf("NewClient failed: %v\n", err)
+			return
 		}
 
+		// loop over registered devices
+		for _, container := range containers {
+			containerName := container.Names[0][1:]
+			device, err := resources.NewEdgeDevice(client, containerName)
+			if err != nil {
+				fmt.Printf("NewEdgeDevice failed: %v\n", err)
+				return
+			}
+
+			// get workloads by device
+			registeredDevice, err := device.Get()
+			workloads := registeredDevice.Status.Workloads
+			for _, workload := range workloads {
+				createdTime := getWorkloadCreationTime(workload.Name)
+				formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
+				fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
+			}
+		}
 	},
 }
 
 func init() {
 	// subcommand of list
-	listCmd.AddCommand(deviceCmd)
+	listCmd.AddCommand(workloadCmd)
+}
+
+func getWorkloadCreationTime(name string) time.Time {
+	client, err := resources.NewClient()
+	if err != nil {
+		fmt.Printf("NewClient failed: %v\n", err)
+		return time.Time{}
+	}
+
+	w, err := resources.NewEdgeWorkload(client)
+	if err != nil {
+		fmt.Printf("NewEdgeWorkload failed: %v\n", err)
+		return time.Time{}
+	}
+
+	workload, err := w.Get(name)
+	if err != nil {
+		fmt.Printf("Get workload failed: %v\n", err)
+		return time.Time{}
+	}
+
+	return workload.CreationTimestamp.Time
 }
