@@ -25,7 +25,7 @@ import (
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add a new flotta resource",
-	Long: `Use the add command to add a flotta resource, such as edgedevice, edgeworkload or edgedeviceset`,
+	Long:  `Use the add command to add a flotta resource, such as edgedevice or edgeworkload`,
 }
 
 func init() {

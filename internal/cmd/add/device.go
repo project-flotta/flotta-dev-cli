@@ -25,8 +25,8 @@ import (
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
-	Short: "Adds a new device",
-	Args: cobra.ExactArgs(1),
+	Short: "Add a new device",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -43,7 +43,11 @@ var deviceCmd = &cobra.Command{
 		err = device.Register()
 		if err != nil {
 			// if device.Register() failed, remove the container
-			device.Remove()
+			err := device.Remove()
+			if err != nil {
+				fmt.Printf("Remove device that failed to register failed: %v\n", err)
+				return
+			}
 
 			fmt.Printf("Register failed: %v\n", err)
 			return

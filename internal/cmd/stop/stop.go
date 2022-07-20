@@ -25,8 +25,8 @@ import (
 // stopCmd represents the stop command
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop a flotta resource",
-	Long: `Use the stop command to stop a flotta resource, such as edgedevice, edgeworkload or edgedeviceset`,
+	Short: "Stop flotta resource",
+	Long:  `Use the stop command to stop a flotta resource, such as edgedevice`,
 }
 
 func init() {

@@ -9,10 +9,9 @@ import (
 	"github.com/docker/docker/pkg/archive"
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/generated/clientset/versioned"
-	managementv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
+	mgmtv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
 	"io/ioutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"os"
 	"path"
@@ -22,16 +21,18 @@ import (
 	"unicode"
 )
 
-var certsPath = "/etc/pki/consumer"
-var CAcertsPath = filepath.Join(certsPath, "ca.pem")
-var ClientCertPath = filepath.Join(certsPath, "cert.pem")
-var ClientKeyPath = filepath.Join(certsPath, "key.pem")
-var certificates = []string{CAcertsPath, ClientKeyPath, ClientCertPath}
-var localCertificates = []string{
-	"/tmp/ca.pem",
-	"/tmp/cert.pem",
-	"/tmp/key.pem",
-}
+var (
+	certsPath         = "/etc/pki/consumer"
+	CACertsPath       = filepath.Join(certsPath, "ca.pem")
+	clientCertPath    = filepath.Join(certsPath, "cert.pem")
+	clientKeyPath     = filepath.Join(certsPath, "key.pem")
+	certificates      = []string{CACertsPath, clientKeyPath, clientCertPath}
+	localCertificates = []string{
+		"/tmp/ca.pem",
+		"/tmp/cert.pem",
+		"/tmp/key.pem",
+	}
+)
 
 const (
 	EdgeDeviceImage string = "quay.io/project-flotta/edgedevice:latest"
@@ -52,12 +53,12 @@ type EdgeDevice interface {
 }
 
 type edgeDevice struct {
-	device managementv1alpha1.ManagementV1alpha1Interface
+	device mgmtv1alpha1.ManagementV1alpha1Interface
 	client *client.Client
 	name   string
 }
 
-func NewEdgeDevice(fclient managementv1alpha1.ManagementV1alpha1Interface, deviceName string) (EdgeDevice, error) {
+func NewEdgeDevice(fclient mgmtv1alpha1.ManagementV1alpha1Interface, deviceName string) (EdgeDevice, error) {
 	client, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, err
@@ -183,7 +184,7 @@ func (e *edgeDevice) CopyCerts() error {
 		}
 	}
 
-	if _, err := e.Exec(fmt.Sprintf("echo 'ca-root = [\"%v\"]' >> /etc/yggdrasil/config.toml", CAcertsPath)); err != nil {
+	if _, err := e.Exec(fmt.Sprintf("echo 'ca-root = [\"%v\"]' >> /etc/yggdrasil/config.toml", CACertsPath)); err != nil {
 		return err
 	}
 
@@ -243,7 +244,7 @@ func (e *edgeDevice) WaitForWorkloadState(workloadName string, workloadPhase v1a
 	})
 }
 
-func NewClient() (managementv1alpha1.ManagementV1alpha1Interface, error) {
+func NewClient() (mgmtv1alpha1.ManagementV1alpha1Interface, error) {
 	homedir, err := os.UserHomeDir()
 	if err != nil {
 		return nil, err
@@ -257,22 +258,4 @@ func NewClient() (managementv1alpha1.ManagementV1alpha1Interface, error) {
 		return nil, err
 	}
 	return clientset.ManagementV1alpha1(), nil
-}
-
-func newClientset() (*kubernetes.Clientset, error) {
-	homedir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", path.Join(homedir, ".kube/config"))
-	if err != nil {
-		return nil, err
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return clientset, nil
 }

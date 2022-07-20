@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
-	managementv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
+	mgmtv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
 )
 
 type EdgeWorkload interface {
@@ -20,10 +20,10 @@ type EdgeWorkload interface {
 }
 
 type edgeWorkload struct {
-	workload managementv1alpha1.ManagementV1alpha1Interface
+	workload mgmtv1alpha1.ManagementV1alpha1Interface
 }
 
-func NewEdgeWorkload(client managementv1alpha1.ManagementV1alpha1Interface) (*edgeWorkload, error) {
+func NewEdgeWorkload(client mgmtv1alpha1.ManagementV1alpha1Interface) (*edgeWorkload, error) {
 	return &edgeWorkload{workload: client}, nil
 }
 
@@ -65,24 +65,6 @@ func (e *edgeWorkload) waitForWorkload(cond func() bool) error {
 	return fmt.Errorf("error waiting for edgeworkload")
 }
 
-func edgeworkloadWithSecretFromEnv(name string, device string, secretName string, image string) *v1alpha1.EdgeWorkload {
-	workload := edgeworkload(name, name, &secretName, nil, image)
-	workload.Spec.Device = device
-	return workload
-}
-
-func edgeworkloadWithConfigMapFromEnv(name, device string, configMap string, image string) *v1alpha1.EdgeWorkload {
-	workload := edgeworkload(name, name, nil, &configMap, image)
-	workload.Spec.Device = device
-	return workload
-}
-
-func edgeworkloadDeviceIdContainers(name string, device string, ctrCount int, image string) *v1alpha1.EdgeWorkload {
-	workload := edgeworkloadContainers(name, name, nil, nil, ctrCount, image)
-	workload.Spec.Device = device
-	return workload
-}
-
 func edgeworkloadDeviceIdCtrName(name string, ctrName string, device string, image string) *v1alpha1.EdgeWorkload {
 	workload := edgeworkload(name, ctrName, nil, nil, image)
 	workload.Spec.Device = device
@@ -91,14 +73,6 @@ func edgeworkloadDeviceIdCtrName(name string, ctrName string, device string, ima
 
 func EdgeworkloadDeviceId(name string, device string, image string) *v1alpha1.EdgeWorkload {
 	return edgeworkloadDeviceIdCtrName(name, name, device, image)
-}
-
-func edgeworkloadDeviceLabel(name string, labels map[string]string, image string) *v1alpha1.EdgeWorkload {
-	workload := edgeworkload(name, name, nil, nil, image)
-	workload.Spec.DeviceSelector = &metav1.LabelSelector{
-		MatchLabels: labels,
-	}
-	return workload
 }
 
 func edgeworkload(name string, ctrName string, secretRef *string, configRef *string, image string) *v1alpha1.EdgeWorkload {
