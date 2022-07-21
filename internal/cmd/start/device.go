@@ -26,7 +26,7 @@ import (
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
-	Short: "Start device",
+	Short: "Start the device",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()

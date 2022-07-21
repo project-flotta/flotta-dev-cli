@@ -25,7 +25,7 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete flotta resource",
+	Short: "Delete the flotta resource",
 	Long:  `Use the delete command to delete a flotta resource, such as edgedevice or edgeworkload`,
 }
 
