@@ -20,6 +20,10 @@ jobs:
         run: |
           dnf -y install @development-tools @rpm-development-tools
           dnf -y install copr-cli make jq
+          VERSION=$(grep ^VERSION_ID /etc/os-release | cut -d= -f2)
+          if [[ $VERSION -eq 35 ]]; then
+            dnf -y install golang --releasever=36  
+          fi
       - name: Check out proper version of sources
         uses: actions/checkout@v3
         with:
