@@ -2,9 +2,9 @@
 name: Rpm build
 on:
   push:
-    branches: [ main ]
+    branches: [ copr ]
   pull_request:
-    branches: [ main ]
+    branches: [ copr ]
 
 jobs:
   rpm:
