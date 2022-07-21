@@ -2,7 +2,7 @@
 name: COPR build
 on:
   push:
-    branches: [ copr ]
+    branches: [ main ]
 jobs:
   rpm:
     name: Submit a build from Fedora container
