@@ -39,7 +39,7 @@ var (
 
 	workloadCmd = &cobra.Command{
 		Use:   "workload",
-		Short: "Add new workload",
+		Short: "Add a new workload",
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {
