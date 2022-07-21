@@ -1,3 +1,9 @@
+VERSION = 0.2.0
+RELEASE = 1
+DIST_DIR = $(shell pwd)/dist
+#OS :=$(shell awk -F= '/^ID/{print $$2}' /etc/os-release)
+#BUILDROOT ?=
+
 # Docker command to use, can be podman
 DOCKER ?= docker
 
@@ -28,6 +34,29 @@ endif
 vendor:
 	go mod tidy -go=1.16 && go mod tidy -go=1.17
 	go mod vendor
+
+rpm-tarball:
+	 (git archive --prefix flotta-dev-cli-$(VERSION)/ HEAD ) \
+	    | gzip > flotta-dev-cli-$(VERSION).tar.gz
+
+rpm-src: rpm-tarball
+	install -D -m644 flotta-dev-cli-$(VERSION).tar.gz --target-directory `rpmbuild -E %_sourcedir`
+	rpmbuild -bs \
+		-D "VERSION $(VERSION)" \
+		-D "RELEASE $(RELEASE)" \
+		--buildroot $(DIST_DIR) ./flotta-dev-cli.spec
+
+rpm-copr-testing: rpm-src
+	copr build project-flotta/flotta-testing $(HOME)/rpmbuild/SRPMS/flotta-dev-cli-$(VERSION)-$(RELEASE).*.src.rpm
+
+rpm-copr: rpm-src
+	copr build project-flotta/flotta $(HOME)/rpmbuild/SRPMS/flotta-dev-cli-$(VERSION)-$(RELEASE).*.src.rpm
+
+rpm-build: rpm-src
+	rpmbuild $(RPMBUILD_OPTS) --rebuild $(HOME)/rpmbuild/SRPMS/flotta-dev-cli-$(VERSION)-$(RELEASE).*.src.rpm
+
+rpm: ## Create rpm build
+	RPMBUILD_OPTS=--target=x86_64 $(MAKE) rpm-build
 
 # go-install-tool will 'go install' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
