@@ -24,7 +24,7 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "Add a new flotta resource",
+	Short: "Add new flotta resource",
 	Long:  `Use the add command to add a flotta resource, such as edgedevice or edgeworkload`,
 }
 
