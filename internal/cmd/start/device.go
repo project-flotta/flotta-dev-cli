@@ -16,9 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
 	"fmt"
+
 	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"github.com/spf13/cobra"
 )
@@ -26,8 +26,8 @@ import (
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
-	Short: "start device",
-	Args: cobra.ExactArgs(1),
+	Short: "Start device",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {

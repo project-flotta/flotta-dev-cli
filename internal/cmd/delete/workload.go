@@ -16,7 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
 	"fmt"
 	"github.com/project-flotta/flotta-dev-cli/internal/resources"
@@ -25,9 +24,9 @@ import (
 
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
-	Use:   "workload",
-	Short: "Delete workload",
-	Args: cobra.ExactArgs(1),
+	Use:   "Delete workload",
+	Short: "Delete workload from flotta",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {

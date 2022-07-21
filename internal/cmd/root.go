@@ -31,10 +31,7 @@ var cfgFile string
 var RootCmd = &cobra.Command{
 	Use:   "flotta",
 	Short: "CLI for project-flotta.io",
-	Long: `CLI for project-flotta.io`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(commands *cobra.Command, args []string) { },
+	Long:  `CLI for project-flotta.io`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -52,7 +49,6 @@ func init() {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.flotta-dev-cli.yaml)")
 
 	// Cobra also supports local flags, which will only run

@@ -39,8 +39,8 @@ var (
 
 	workloadCmd = &cobra.Command{
 		Use:   "workload",
-		Short: "Adds a new workload",
-		Args: cobra.MaximumNArgs(1),
+		Short: "Add a new workload",
+		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {
 				workloadImage = defaultImage
@@ -104,7 +104,11 @@ func init() {
 	workloadCmd.PersistentFlags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
 
 	// mark device flag as required
-	workloadCmd.MarkPersistentFlagRequired("device")
+	err := workloadCmd.MarkPersistentFlagRequired("device")
+	if err != nil {
+		fmt.Printf("MarkPersistentFlagRequired for workload failed: %v\n", err)
+		return
+	}
 }
 
 func RandomSuffix() string {

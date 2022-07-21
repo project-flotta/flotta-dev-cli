@@ -25,7 +25,7 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List flotta resources",
-	Long: `Use the list command to list all the flotta resources who match the specified type.`,
+	Long:  `Use the list command to list all the flotta resources that match the specified type.`,
 }
 
 func init() {

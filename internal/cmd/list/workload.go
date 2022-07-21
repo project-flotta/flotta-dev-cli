@@ -19,22 +19,24 @@ limitations under the License.
 import (
 	"context"
 	"fmt"
-	"github.com/project-flotta/flotta-dev-cli/internal/resources"
+	"os"
+	"sort"
+	"text/tabwriter"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-units"
 	"github.com/spf13/cobra"
-	"os"
-	"sort"
-	"text/tabwriter"
-	"time"
+
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 )
 
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
 	Use:   "workload",
-	Short: "list workloads",
+	Short: "List workloads",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
@@ -79,6 +81,10 @@ var workloadCmd = &cobra.Command{
 
 			// get workloads by device
 			registeredDevice, err := device.Get()
+			if err != nil {
+				fmt.Printf("Get device failed: %v\n", err)
+				return
+			}
 			workloads := registeredDevice.Status.Workloads
 			for _, workload := range workloads {
 				createdTime := getWorkloadCreationTime(workload.Name)

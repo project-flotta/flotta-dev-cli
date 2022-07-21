@@ -16,18 +16,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 import (
-"fmt"
-"github.com/project-flotta/flotta-dev-cli/internal/resources"
-"github.com/spf13/cobra"
+	"fmt"
+
+	"github.com/spf13/cobra"
+
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 )
 
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
-	Short: "Delete device",
-	Args: cobra.ExactArgs(1),
+	Short: "Delete the device from flotta",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
