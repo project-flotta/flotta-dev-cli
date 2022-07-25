@@ -24,7 +24,7 @@ import (
 
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
-	Use:   "Delete workload",
+	Use:   "workload",
 	Short: "Delete the workload from flotta",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
