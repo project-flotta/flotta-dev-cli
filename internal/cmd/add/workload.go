@@ -40,7 +40,6 @@ var (
 	workloadCmd = &cobra.Command{
 		Use:   "workload",
 		Short: "Add a new workload",
-		Args:  cobra.MaximumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {
 				workloadImage = defaultImage
@@ -54,10 +53,8 @@ var (
 				return
 			}
 
-			if len(args) == 0 {
+			if len(workloadName) == 0 {
 				workloadName = normalizedImage + "-" + RandomSuffix()
-			} else {
-				workloadName = args[0]
 			}
 
 			client, err := resources.NewClient()
@@ -72,6 +69,10 @@ var (
 				return
 			}
 
+			_, err = device.Get(); if err != nil {
+				fmt.Printf("Get device %s failed: %v\n", deviceID, err)
+				return
+			}
 			workload, err := resources.NewEdgeWorkload(client)
 			if err != nil {
 				fmt.Printf("NewEdgeWorkload failed: %v\n", err)
@@ -100,15 +101,12 @@ func init() {
 	addCmd.AddCommand(workloadCmd)
 
 	// define command flags
-	workloadCmd.PersistentFlags().StringVarP(&deviceID, "device", "d", "", "device to run the container workload on")
-	workloadCmd.PersistentFlags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
+	workloadCmd.Flags().StringVarP(&deviceID, "device", "d", "", "device to run the workload on")
+	workloadCmd.Flags().StringVarP(&workloadName, "name", "n", "", "name of the workload to add")
+	workloadCmd.Flags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
 
 	// mark device flag as required
-	err := workloadCmd.MarkPersistentFlagRequired("device")
-	if err != nil {
-		fmt.Printf("MarkPersistentFlagRequired for workload failed: %v\n", err)
-		return
-	}
+	workloadCmd.MarkFlagRequired("device")
 }
 
 func RandomSuffix() string {

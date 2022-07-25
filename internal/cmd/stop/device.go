@@ -22,11 +22,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var deviceName string
+
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
 	Short: "Stop the device",
-	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -34,7 +35,7 @@ var deviceCmd = &cobra.Command{
 			return
 		}
 
-		device, err := resources.NewEdgeDevice(client, args[0])
+		device, err := resources.NewEdgeDevice(client, deviceName)
 		if err != nil {
 			fmt.Printf("NewEdgeDevice failed: %v\n", err)
 			return
@@ -53,4 +54,8 @@ var deviceCmd = &cobra.Command{
 func init() {
 	// subcommand of stop
 	stopCmd.AddCommand(deviceCmd)
+
+	// define command flags
+	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to stop")
+	deviceCmd.MarkFlagRequired("name")
 }
