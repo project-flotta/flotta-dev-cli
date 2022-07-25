@@ -22,11 +22,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var workloadName string
+
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
 	Use:   "workload",
 	Short: "Delete the workload from flotta",
-	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
@@ -40,17 +41,21 @@ var workloadCmd = &cobra.Command{
 			return
 		}
 
-		err = workload.Remove(args[0])
+		err = workload.Remove(workloadName)
 		if err != nil {
 			fmt.Printf("Remove workload failed: %v\n", err)
 			return
 		}
 
-		fmt.Printf("workload '%v' was deleted \n", args[0])
+		fmt.Printf("workload '%v' was deleted \n", workloadName)
 	},
 }
 
 func init() {
 	// subcommand of delete
 	deleteCmd.AddCommand(workloadCmd)
+
+	// define command flags
+	workloadCmd.Flags().StringVarP(&workloadName, "name", "n", "", "name of the workload to delete")
+	workloadCmd.MarkFlagRequired("name")
 }
