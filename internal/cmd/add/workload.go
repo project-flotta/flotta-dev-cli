@@ -18,13 +18,15 @@ package add
 
 import (
 	"fmt"
-	"github.com/project-flotta/flotta-dev-cli/internal/resources"
-	"github.com/spf13/cobra"
-	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 	"math/rand"
+	"os"
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
+	"github.com/spf13/cobra"
+	k8svalidation "k8s.io/apimachinery/pkg/util/validation"
 )
 
 const (
@@ -69,7 +71,8 @@ var (
 				return
 			}
 
-			_, err = device.Get(); if err != nil {
+			_, err = device.Get()
+			if err != nil {
 				fmt.Printf("Get device %s failed: %v\n", deviceID, err)
 				return
 			}
@@ -106,7 +109,11 @@ func init() {
 	workloadCmd.Flags().StringVarP(&workloadImage, "image", "i", "", "image of the workload")
 
 	// mark device flag as required
-	workloadCmd.MarkFlagRequired("device")
+	err := workloadCmd.MarkFlagRequired("device")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 func RandomSuffix() string {

@@ -18,6 +18,8 @@ package add
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"github.com/spf13/cobra"
 )
@@ -64,5 +66,9 @@ func init() {
 
 	// define command flags
 	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to add")
-	deviceCmd.MarkFlagRequired("name")
+	err := deviceCmd.MarkFlagRequired("name")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
+		os.Exit(1)
+	}
 }
