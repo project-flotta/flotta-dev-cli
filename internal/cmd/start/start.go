@@ -25,7 +25,7 @@ import (
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Start flotta resource",
+	Short: "Start a flotta resource",
 	Long:  `Use the start command to start a flotta resource, such as edgedevice`,
 }
 

@@ -25,7 +25,7 @@ import (
 // stopCmd represents the stop command
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop flotta resource",
+	Short: "Stop a flotta resource",
 	Long:  `Use the stop command to stop a flotta resource, such as edgedevice`,
 }
 
