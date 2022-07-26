@@ -19,4 +19,4 @@ jobs:
         go-version: 1.18
 
     - name: Build
-      run: go build -mod=vendor -o bin/flotta main.go
+      run: make build
