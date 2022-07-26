@@ -29,7 +29,7 @@ var deviceName string
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
-	Short: "Stop the device",
+	Short: "Stop a device",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {

@@ -25,19 +25,21 @@ Use the developer CLI commands by running:
 For example:
 `bin/flotta add device --name mydevice`
 
-
+See usage below for more details.
 ```
+CLI for project-flotta.io
+
 Usage:
   flotta [command]
 
 Available Commands:
   add         Add a new flotta resource
   completion  Generate the autocompletion script for the specified shell
-  delete      Delete the flotta resource
+  delete      Delete a flotta resource
   help        Help about any command
   list        List flotta resources
-  start       Start flotta resource
-  stop        Stop flotta resource
+  start       Start a flotta resource
+  stop        Stop a flotta resource
 
 Flags:
   -h, --help   help for flotta
