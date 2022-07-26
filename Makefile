@@ -14,7 +14,7 @@ build: fmt lint vet
 
 LINT_IMAGE=golangci/golangci-lint:v1.45.0
 lint: ## Check if the go code is properly written, rules are in .golangci.yml
-	$(DOCKER) run --rm -v $(CURDIR):$(CURDIR) -w="$(CURDIR)" $(LINT_IMAGE) sh -c 'golangci-lint run'
+	$(DOCKER) run --rm -v $(CURDIR):$(CURDIR):z -w="$(CURDIR)" $(LINT_IMAGE) sh -c 'golangci-lint run'
 
 fmt: ## Run go fmt against code.
 	go fmt ./...
