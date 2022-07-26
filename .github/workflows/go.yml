@@ -19,4 +19,16 @@ jobs:
         go-version: 1.18
 
     - name: Build
-      run: make build
+      run: go build -mod=vendor -o bin/flotta main.go
+
+  Lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v2.5.1
+        with:
+          args: --timeout=2m
