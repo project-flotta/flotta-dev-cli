@@ -77,6 +77,15 @@ func (e *edgeDevice) Register(cmds ...string) error {
 		image = name
 	}
 	ctx := context.Background()
+	out, err := e.client.ImagePull(ctx, image, types.ImagePullOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to pull image '%s': %v", image, err)
+	}
+	defer out.Close()
+	if _, err := ioutil.ReadAll(out); err != nil {
+		return err
+	}
+
 	resp, err := e.client.ContainerCreate(ctx, &container.Config{Image: image, Labels: map[string]string{"flotta": "true"}}, &container.HostConfig{Privileged: true, ExtraHosts: []string{"project-flotta.io:172.17.0.1"}}, nil, nil, e.name)
 	if err != nil {
 		return err
