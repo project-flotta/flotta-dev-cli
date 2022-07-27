@@ -1,5 +1,5 @@
 VERSION = 0.2.0
-RELEASE = 2
+RELEASE = 3
 DIST_DIR = $(shell pwd)/dist
 #OS :=$(shell awk -F= '/^ID/{print $$2}' /etc/os-release)
 #BUILDROOT ?=

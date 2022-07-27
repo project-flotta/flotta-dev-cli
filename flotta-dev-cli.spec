@@ -1,6 +1,6 @@
 Name:       flotta-dev-cli
 Version:    0.2.0
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    CLI for flotta development
 ExclusiveArch: %{go_arches}
 Group:      Flotta
@@ -34,7 +34,10 @@ install -m 755 ./bin/flotta %{buildroot}%{_bindir}/flotta
 %{_bindir}/flotta
 
 %changelog
-* Tue Jul 27 2022 Moti Asayag <masayag@redhat.com> 0.2.0-2
+* Wed Jul 27 2022 Moti Asayag <masayag@redhat.com> 0.2.0-3
+- Pull edgedevice image if not available
+
+* Wed  Jul 27 2022 Moti Asayag <masayag@redhat.com> 0.2.0-2
 - Replaced nameless args with named flags in cli commands.
 - Allow adding workloads only to existing devices.
 
