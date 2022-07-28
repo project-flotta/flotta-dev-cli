@@ -2,7 +2,16 @@ package resources
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
+	"unicode"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -10,15 +19,8 @@ import (
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/generated/clientset/versioned"
 	mgmtv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
-	"io/ioutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
-	"time"
-	"unicode"
 )
 
 var (
@@ -177,6 +179,9 @@ func (e *edgeDevice) CopyCerts() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	for _, certificatePath := range localCertificates {
+		if _, err := os.Stat(certificatePath); errors.Is(err, os.ErrNotExist) {
+			return err
+		}
 		fp, err := archive.Tar(certificatePath, archive.Gzip)
 		if err != nil {
 			return err
