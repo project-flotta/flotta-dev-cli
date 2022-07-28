@@ -46,9 +46,9 @@ var deviceCmd = &cobra.Command{
 		err = device.Register()
 		if err != nil {
 			// if device.Register() failed, remove the container
-			err := device.Remove()
-			if err != nil {
-				fmt.Printf("Remove device that failed to register failed: %v\n", err)
+			err2 := device.Remove()
+			if err2 != nil {
+				fmt.Printf("Remove device that failed to register failed: %v\n", err2)
 				return
 			}
 
