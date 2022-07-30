@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -235,7 +236,12 @@ func (e *edgeDevice) waitForDevice(cond func() bool) error {
 		}
 	}
 
-	return fmt.Errorf("error waiting for edgedevice %v[%v]", e.name, e.name)
+	res, err := exec.Command("minikube", "status", "--format", "{{.Host}}").Output()
+	portForward := ""
+	if err == nil && string(res) == "Running" {
+		portForward = ". `minikube` cluster is running, is `kubectl port-forward` command executing?"
+	}
+	return fmt.Errorf("error waiting for edgedevice %v[%v]%s", e.name, e.name, portForward)
 }
 
 func (e *edgeDevice) WaitForWorkloadState(workloadName string, workloadPhase v1alpha1.EdgeWorkloadPhase) error {
