@@ -28,7 +28,6 @@ jobs:
       - name: Build the source RPM
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          make rpm-tarball
           make rpm-src
       - name: Submit the build by uploading the source RPM
         run: |
