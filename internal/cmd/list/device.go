@@ -32,8 +32,9 @@ import (
 
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
-	Use:   "device",
-	Short: "List devices",
+	Use:     "device",
+	Aliases: []string{"devices"},
+	Short:   "List devices",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())

@@ -35,8 +35,9 @@ import (
 
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
-	Use:   "workload",
-	Short: "List workloads",
+	Use:     "workload",
+	Aliases: []string{"workloads"},
+	Short:   "List workloads",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
