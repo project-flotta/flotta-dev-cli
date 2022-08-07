@@ -37,7 +37,7 @@ var (
 )
 
 const (
-	EdgeDeviceImage string = "quay.io/project-flotta/edgedevice:latest"
+	EdgeDeviceImage string = "quay.io/project-flotta/edgedevice:cli"
 	Namespace       string = "default"
 	waitTimeout     int    = 120
 	sleepInterval   int    = 2
