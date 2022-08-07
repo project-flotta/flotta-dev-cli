@@ -1,6 +1,6 @@
 Name:       flotta-dev-cli
 Version:    0.2.0
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    CLI for flotta development
 ExclusiveArch: %{go_arches}
 Group:      Flotta
@@ -34,6 +34,9 @@ install -m 755 ./bin/flotta %{buildroot}%{_bindir}/flotta
 %{_bindir}/flotta
 
 %changelog
+* Sun Aug 7 2022 Moti Asayag <masayag@redhat.com> 0.2.0-4
+- Pin edgedevice image to a stable version
+
 * Wed Jul 27 2022 Moti Asayag <masayag@redhat.com> 0.2.0-3
 - Pull edgedevice image if not available
 
