@@ -41,6 +41,7 @@ var (
 
 	workloadCmd = &cobra.Command{
 		Use:   "workload",
+		Aliases: []string{"workloads"},
 		Short: "Add a new workload",
 		Run: func(cmd *cobra.Command, args []string) {
 			if workloadImage == "" {

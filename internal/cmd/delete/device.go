@@ -30,6 +30,7 @@ var deviceName string
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
 	Use:   "device",
+	Aliases: []string{"devices"},
 	Short: "Delete a device from flotta",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
