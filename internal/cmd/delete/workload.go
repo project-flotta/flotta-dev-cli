@@ -29,6 +29,7 @@ var workloadName string
 // workloadCmd represents the workload command
 var workloadCmd = &cobra.Command{
 	Use:   "workload",
+	Aliases: []string{"workloads"},
 	Short: "Delete a workload from flotta",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
