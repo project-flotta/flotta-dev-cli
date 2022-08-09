@@ -28,9 +28,9 @@ var deviceName string
 
 // deviceCmd represents the device command
 var deviceCmd = &cobra.Command{
-	Use:   "device",
+	Use:     "device",
 	Aliases: []string{"devices"},
-	Short: "Add a new device",
+	Short:   "Add a new device",
 	Run: func(cmd *cobra.Command, args []string) {
 		client, err := resources.NewClient()
 		if err != nil {
