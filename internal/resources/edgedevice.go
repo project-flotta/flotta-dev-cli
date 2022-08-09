@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -84,7 +84,7 @@ func (e *edgeDevice) Register(cmds ...string) error {
 		return fmt.Errorf("failed to pull image '%s': %v", image, err)
 	}
 	defer out.Close()
-	if _, err := ioutil.ReadAll(out); err != nil {
+	if _, err := io.ReadAll(out); err != nil {
 		return err
 	}
 
@@ -216,7 +216,7 @@ func (e *edgeDevice) Exec(command string) (string, error) {
 	}
 	defer response.Close()
 
-	data, err := ioutil.ReadAll(response.Reader)
+	data, err := io.ReadAll(response.Reader)
 	if err != nil {
 		return "", err
 	}
