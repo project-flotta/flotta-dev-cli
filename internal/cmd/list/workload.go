@@ -17,16 +17,11 @@ limitations under the License.
 */
 
 import (
-	"context"
 	"fmt"
 	"os"
-	"sort"
 	"text/tabwriter"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
 	"github.com/docker/go-units"
 	"github.com/spf13/cobra"
 
@@ -39,30 +34,9 @@ var workloadCmd = &cobra.Command{
 	Aliases: []string{"workloads"},
 	Short:   "List workloads",
 	Run: func(cmd *cobra.Command, args []string) {
-		ctx := context.Background()
-		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-		if err != nil {
-			panic(err)
-		}
-
-		// list of containers that contain the label flotta
-		filter := filters.Arg("label", "flotta")
-		opts := types.ContainerListOptions{All: true, Filters: filters.NewArgs(filter)}
-
-		containers, err := cli.ContainerList(ctx, opts)
-		if err != nil {
-			panic(err)
-		}
-
-		// sort containers by container name
-		sort.Slice(containers, func(i, j int) bool {
-			return containers[i].Names[0] < containers[j].Names[0]
-		})
 
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
-
 		defer writer.Flush()
-
 		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 
 		client, err := resources.NewClient()
@@ -71,10 +45,19 @@ var workloadCmd = &cobra.Command{
 			return
 		}
 
+		// create a list of all registered devices
+		device, err := resources.NewEdgeDevice(client, "")
+		if err != nil {
+			fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
+		}
+		devicesList, err := device.List()
+		if err != nil {
+			fmt.Printf("List() device failed: %v\n", err)
+		}
+
 		// loop over registered devices
-		for _, container := range containers {
-			containerName := container.Names[0][1:]
-			device, err := resources.NewEdgeDevice(client, containerName)
+		for _, dvc := range devicesList.Items {
+			device, err := resources.NewEdgeDevice(client, dvc.Name)
 			if err != nil {
 				fmt.Printf("NewEdgeDevice failed: %v\n", err)
 				return
