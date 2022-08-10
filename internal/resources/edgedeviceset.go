@@ -15,6 +15,7 @@ type EdgeDeviceSet interface {
 	Get(string) (*v1alpha1.EdgeDeviceSet, error)
 	Remove(string) error
 	RemoveAll() error
+	List() (*v1alpha1.EdgeDeviceSetList, error)
 }
 
 type edgeDeviceSet struct {
@@ -32,6 +33,10 @@ func (e *edgeDeviceSet) GetName() string {
 
 func (e *edgeDeviceSet) Get(name string) (*v1alpha1.EdgeDeviceSet, error) {
 	return e.deviceset.EdgeDeviceSets(Namespace).Get(context.TODO(), name, metav1.GetOptions{})
+}
+
+func (e *edgeDeviceSet) List() (*v1alpha1.EdgeDeviceSetList, error) {
+	return e.deviceset.EdgeDeviceSets(Namespace).List(context.TODO(), metav1.ListOptions{})
 }
 
 func (e *edgeDeviceSet) Create(eds *v1alpha1.EdgeDeviceSet) (*v1alpha1.EdgeDeviceSet, error) {
