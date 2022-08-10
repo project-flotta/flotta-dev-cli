@@ -43,7 +43,7 @@ var (
 		Use:     "workload",
 		Aliases: []string{"workloads"},
 		Short:   "Add a new workload",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if workloadImage == "" {
 				workloadImage = defaultImage
 			}
@@ -52,8 +52,8 @@ var (
 			splitImage := strings.Split(workloadImage, "/")
 			normalizedImage, error := NormalizeString(splitImage[len(splitImage)-1])
 			if error != nil {
-				fmt.Printf("image: %s contains invalid characters", workloadImage)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "image: %s contains invalid characters\n", workloadImage)
+				return error
 			}
 
 			if len(workloadName) == 0 {
@@ -62,40 +62,41 @@ var (
 
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Printf("NewClient failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+				return err
 			}
 
 			device, err := resources.NewEdgeDevice(client, deviceID)
 			if err != nil {
-				fmt.Printf("NewEdgeDevice failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				return err
 			}
 
 			_, err = device.Get()
 			if err != nil {
-				fmt.Printf("Get device %s failed: %v\n", deviceID, err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Get device '%s' failed: %v\n", deviceID, err)
+				return err
 			}
 			workload, err := resources.NewEdgeWorkload(client)
 			if err != nil {
-				fmt.Printf("NewEdgeWorkload failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
+				return err
 			}
 
 			_, err = workload.Create(resources.EdgeworkloadDeviceId(workloadName, deviceID, workloadImage))
 			if err != nil {
-				fmt.Printf("Create workload failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Create workload '%s' failed: %v\n", workloadName, err)
+				return err
 			}
 
 			err = device.WaitForWorkloadState(workloadName, "Running")
 			if err != nil {
-				fmt.Printf("WaitForWorkloadState failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "WaitForWorkloadState failed: %v\n", err)
+				return err
 			}
 
-			fmt.Printf("workload '%s' was added to device '%s'\n", workloadName, deviceID)
+			fmt.Fprintf(cmd.OutOrStdout(), "workload '%s' was added to device '%s'\n", workloadName, deviceID)
+			return nil
 		},
 	}
 )
