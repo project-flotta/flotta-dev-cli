@@ -33,7 +33,7 @@ var workloadCmd = &cobra.Command{
 	Use:     "workload",
 	Aliases: []string{"workloads"},
 	Short:   "List workloads",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
 		defer writer.Flush()
@@ -41,8 +41,8 @@ var workloadCmd = &cobra.Command{
 
 		client, err := resources.NewClient()
 		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+			return err
 		}
 
 		// create a list of all registered devices
@@ -59,23 +59,28 @@ var workloadCmd = &cobra.Command{
 		for _, dvc := range devicesList.Items {
 			device, err := resources.NewEdgeDevice(client, dvc.Name)
 			if err != nil {
-				fmt.Printf("NewEdgeDevice failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				return err
 			}
 
 			// get workloads by device
 			registeredDevice, err := device.Get()
 			if err != nil {
-				fmt.Printf("Get device failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Get device failed: %v\n", err)
+				return err
 			}
 			workloads := registeredDevice.Status.Workloads
 			for _, workload := range workloads {
-				createdTime := getWorkloadCreationTime(workload.Name)
+				createdTime, err := getWorkloadCreationTime(workload.Name)
+				if err != nil {
+					fmt.Fprintf(cmd.OutOrStderr(), "getWorkloadCreationTime failed: %v\n", err)
+					return err
+				}
 				formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
 				fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
 			}
 		}
+		return nil
 	},
 }
 
@@ -84,24 +89,21 @@ func init() {
 	listCmd.AddCommand(workloadCmd)
 }
 
-func getWorkloadCreationTime(name string) time.Time {
+func getWorkloadCreationTime(name string) (time.Time, error) {
 	client, err := resources.NewClient()
 	if err != nil {
-		fmt.Printf("NewClient failed: %v\n", err)
-		return time.Time{}
+		return time.Time{}, err
 	}
 
 	w, err := resources.NewEdgeWorkload(client)
 	if err != nil {
-		fmt.Printf("NewEdgeWorkload failed: %v\n", err)
-		return time.Time{}
+		return time.Time{}, err
 	}
 
 	workload, err := w.Get(name)
 	if err != nil {
-		fmt.Printf("Get workload failed: %v\n", err)
-		return time.Time{}
+		return time.Time{}, err
 	}
 
-	return workload.CreationTimestamp.Time
+	return workload.CreationTimestamp.Time, nil
 }

@@ -24,7 +24,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/go-units"
 	"github.com/spf13/cobra"
-	"os"
 	"sort"
 	"text/tabwriter"
 	"time"
@@ -35,11 +34,12 @@ var deviceCmd = &cobra.Command{
 	Use:     "device",
 	Aliases: []string{"devices"},
 	Short:   "List devices",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClientWithOpts failed: %v\n", err)
+			return err
 		}
 
 		// list of containers that contain the label flotta
@@ -48,7 +48,8 @@ var deviceCmd = &cobra.Command{
 
 		containers, err := cli.ContainerList(ctx, opts)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(cmd.OutOrStderr(), "ContainerList failed: %v\n", err)
+			return err
 		}
 
 		// sort containers by container name
@@ -56,7 +57,7 @@ var deviceCmd = &cobra.Command{
 			return containers[i].Names[0] < containers[j].Names[0]
 		})
 
-		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
+		writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
 
 		defer writer.Flush()
 
@@ -70,6 +71,7 @@ var deviceCmd = &cobra.Command{
 			fmt.Fprintf(writer, "%s\t%v\t%s\t\n", containerName, container.State, runningFor)
 		}
 
+		return nil
 	},
 }
 
