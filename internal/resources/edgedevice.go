@@ -48,6 +48,7 @@ type EdgeDevice interface {
 	Register(cmds ...string) error
 	Unregister() error
 	Get() (*v1alpha1.EdgeDevice, error)
+	List() (*v1alpha1.EdgeDeviceList, error)
 	Remove() error
 	Stop() error
 	Start() error
@@ -160,6 +161,10 @@ func (e *edgeDevice) Get() (*v1alpha1.EdgeDevice, error) {
 	}
 
 	return device, nil
+}
+
+func (e *edgeDevice) List() (*v1alpha1.EdgeDeviceList, error) {
+	return e.device.EdgeDevices(Namespace).List(context.TODO(), metav1.ListOptions{})
 }
 
 func (e *edgeDevice) Stop() error {
