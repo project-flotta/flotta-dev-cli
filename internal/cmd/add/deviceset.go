@@ -19,10 +19,11 @@ var (
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
 		Short:   "Add a new device set with registered devices",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			if deviceSetSize < 0 {
-				fmt.Printf("deviceSetSize is invalid: %d. Only positive values are allowed\n", deviceSetSize)
-				return
+				err := fmt.Errorf("deviceSetSize is invalid: %d. Only positive values are allowed", deviceSetSize)
+				fmt.Fprintf(cmd.OutOrStderr(), err.Error()+"\n")
+				return err
 			}
 
 			// if devices prefix has not been specified, use deviceSetName as prefix
@@ -32,23 +33,23 @@ var (
 
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Printf("NewClient failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed %v\n", err)
+				return err
 			}
 
 			deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
 			if err != nil {
-				fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+				return err
 			}
 
 			_, err = deviceset.Create(resources.EdgeDeviceSetConfig(deviceSetName))
 			if err != nil {
-				fmt.Printf("Create deviceset failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Create device-set failed: %v\n", err)
+				return err
 			}
 
-			fmt.Printf("deviceset '%s' was added\n", deviceSetName)
+			fmt.Fprintf(cmd.OutOrStdout(), "device-set '%s' was added\n", deviceSetName)
 
 			// add devices to the deviceset
 			devicesCreated := 0
@@ -56,12 +57,13 @@ var (
 				deviceName := fmt.Sprintf("%s%d", deviceNamePrefix, i)
 				err := NewDeviceToSet(deviceSetName, deviceName)
 				if err != nil {
-					fmt.Printf("NewDeviceToSet failed: %v. Device: %s\n", err, deviceName)
+					fmt.Fprintf(cmd.OutOrStderr(), "NewDeviceToSet failed: %v. Device: %s\n", err, deviceName)
 				} else {
 					devicesCreated += 1
-					fmt.Printf("device '%s' was added successfully to device-set '%s' (%d/%d)\n", deviceName, deviceSetName, devicesCreated, deviceSetSize)
+					fmt.Fprintf(cmd.OutOrStdout(), "device '%s' was added successfully to device-set '%s' (%d/%d)\n", deviceName, deviceSetName, devicesCreated, deviceSetSize)
 				}
 			}
+			return nil
 		},
 	}
 )
@@ -86,13 +88,11 @@ func init() {
 func NewDeviceToSet(deviceSetName, deviceName string) error {
 	client, err := resources.NewClient()
 	if err != nil {
-		fmt.Printf("NewClient failed: %v\n", err)
 		return err
 	}
 
 	device, err := resources.NewEdgeDevice(client, deviceName)
 	if err != nil {
-		fmt.Printf("NewEdgeDevice failed: %v\n", err)
 		return err
 	}
 
@@ -101,26 +101,23 @@ func NewDeviceToSet(deviceSetName, deviceName string) error {
 		// if device.Register() failed, remove the container
 		err2 := device.Remove()
 		if err2 != nil {
-			fmt.Printf("Remove device that failed to register failed: %v\n", err2)
 			return err2
 		}
 
-		fmt.Printf("Register failed: %v\n", err)
 		return err
 	}
 
 	// get the new device in order to add 'flotta/member-of' label
 	dvc, err := device.Get()
 	if err != nil {
-		fmt.Printf("Get device %s failed: %v\n", deviceName, err)
 		return err
 	}
 
 	// update the device
 	dvc.Labels["flotta/member-of"] = deviceSetName
-	dvc, err = client.EdgeDevices("default").Update(context.TODO(), dvc, v1.UpdateOptions{})
+	_, err = client.EdgeDevices("default").Update(context.TODO(), dvc, v1.UpdateOptions{})
 	if err != nil {
-		fmt.Printf("Update device '%s' failed: %v\n", dvc.Name, err)
+		return err
 	}
 
 	return nil

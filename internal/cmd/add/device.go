@@ -31,17 +31,17 @@ var deviceCmd = &cobra.Command{
 	Use:     "device",
 	Aliases: []string{"devices"},
 	Short:   "Add a new device",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := resources.NewClient()
 		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+			return err
 		}
 
 		device, err := resources.NewEdgeDevice(client, deviceName)
 		if err != nil {
-			fmt.Printf("NewEdgeDevice failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+			return err
 		}
 
 		err = device.Register()
@@ -49,15 +49,16 @@ var deviceCmd = &cobra.Command{
 			// if device.Register() failed, remove the container
 			err2 := device.Remove()
 			if err2 != nil {
-				fmt.Printf("Remove device that failed to register failed: %v\n", err2)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Remove device that failed to register failed: %v\n", err2)
+				return err
 			}
 
-			fmt.Printf("Register failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "Register device failed: %v\n", err)
+			return err
 		}
 
-		fmt.Printf("device '%v' was added \n", device.GetName())
+		fmt.Fprintf(cmd.OutOrStdout(), "device '%s' was added\n", device.GetName())
+		return nil
 	},
 }
 
