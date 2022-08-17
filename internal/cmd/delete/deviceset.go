@@ -88,6 +88,11 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	// if "all" flag was provided, set "deleteDevices" flag to true
+	if deviceSetCmd.Flags().Lookup("all").Changed {
+		deleteDevices = true
+	}
 }
 
 func getDevicesNamesList() ([]string, error) {
