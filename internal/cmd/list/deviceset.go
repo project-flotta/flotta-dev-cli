@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/docker/go-units"
 	"github.com/spf13/cobra"
-	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -33,36 +32,40 @@ var deviceSetCmd = &cobra.Command{
 	Use:     "deviceset",
 	Aliases: []string{"devicesets"},
 	Short:   "List device-sets",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 
-		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
+		writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
 		defer writer.Flush()
 		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "DEVICES", "CREATED")
 
 		client, err := resources.NewClient()
 		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+			return err
 		}
 
 		// create a list of all device-sets
 		deviceset, err := resources.NewEdgeDeviceSet(client, "")
 		if err != nil {
-			fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+			return err
 		}
 		setsList, err := deviceset.List()
 		if err != nil {
-			fmt.Printf("List() device-set failed: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStderr(), "List() device-set failed: %v\n", err)
+			return err
 		}
 
 		// create a list of all registered devices
 		device, err := resources.NewEdgeDevice(client, "")
 		if err != nil {
-			fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+			return err
 		}
 		devicesList, err := device.List()
 		if err != nil {
-			fmt.Printf("List() device failed: %v\n", err)
+			fmt.Fprintf(cmd.OutOrStderr(), "List() device failed: %v\n", err)
+			return err
 		}
 
 		// create a map of sets names and their devices
@@ -79,6 +82,8 @@ var deviceSetCmd = &cobra.Command{
 			runningFor := units.HumanDuration(time.Now().UTC().Sub(set.CreationTimestamp.Time)) + " ago"
 			fmt.Fprintf(writer, "%s\t%v\t%s\t\n", set.Name, devices, runningFor)
 		}
+
+		return nil
 	},
 }
 
