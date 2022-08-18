@@ -31,26 +31,27 @@ var workloadCmd = &cobra.Command{
 	Use:     "workload",
 	Aliases: []string{"workloads"},
 	Short:   "Delete a workload from flotta",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := resources.NewClient()
 		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+			return err
 		}
 
 		workload, err := resources.NewEdgeWorkload(client)
 		if err != nil {
-			fmt.Printf("NewEdgeWorkload failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
+			return err
 		}
 
 		err = workload.Remove(workloadName)
 		if err != nil {
-			fmt.Printf("Remove workload failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "Remove workload failed: %v\n", err)
+			return err
 		}
 
-		fmt.Printf("workload '%v' was deleted \n", workloadName)
+		fmt.Fprintf(cmd.OutOrStdout(), "workload '%v' was deleted \n", workloadName)
+		return nil
 	},
 }
 

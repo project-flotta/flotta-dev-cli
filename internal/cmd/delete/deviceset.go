@@ -38,39 +38,40 @@ var deviceSetCmd = &cobra.Command{
 	Use:     "deviceset",
 	Aliases: []string{"devicesets"},
 	Short:   "Delete a deviceset from flotta",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error{
 		client, err := resources.NewClient()
 		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+			return err
 		}
 
 		deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
 		if err != nil {
-			fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+			return err
 		}
 
 		err = deviceset.Remove(deviceSetName)
 		if err != nil {
-			fmt.Printf("Remove deviceset failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "Remove deviceset failed: %v\n", err)
+			return err
 		}
 
-		fmt.Printf("deviceset '%v' was deleted \n", deviceSetName)
+		fmt.Fprintf(cmd.OutOrStdout(), "deviceset '%v' was deleted \n", deviceSetName)
 
 		devices, err := getDevicesNamesList()
 		if err != nil {
-			fmt.Printf("getDevicesList failed: %v\n", err)
-			return
+			fmt.Fprintf(cmd.OutOrStderr(), "getDevicesList failed: %v\n", err)
+			return err
 		}
 
 		for _, deviceName := range devices {
-			err := updateDeviceAfterSetDeletion(deviceName)
+			err := updateDeviceAfterSetDeletion(deviceName, cmd)
 			if err != nil {
-				fmt.Printf("updateDeviceAfterSetDeletion failed: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStderr(), "updateDeviceAfterSetDeletion failed: %v\n", err)
 			}
 		}
+		return nil
 	},
 }
 
@@ -124,7 +125,7 @@ func getDevicesNamesList() ([]string, error) {
 	return names, nil
 }
 
-func updateDeviceAfterSetDeletion(deviceName string) error {
+func updateDeviceAfterSetDeletion(deviceName string, cmd *cobra.Command) error {
 	client, err := resources.NewClient()
 	if err != nil {
 		return err
@@ -152,7 +153,7 @@ func updateDeviceAfterSetDeletion(deviceName string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("device '%v' was deleted successfully\n", deviceName)
+			fmt.Fprintf(cmd.OutOrStdout(), "device '%v' was deleted successfully\n", deviceName)
 		} else {
 			// remove the label and update the device
 			delete(dvc.Labels, "flotta/member-of")
@@ -160,7 +161,7 @@ func updateDeviceAfterSetDeletion(deviceName string) error {
 			if err != nil {
 				return err
 			} else {
-				fmt.Printf("the label 'flotta/member-of:%s' was removed successfully from device '%s'\n", deviceSetName, deviceName)
+				fmt.Fprintf(cmd.OutOrStdout(), "the label 'flotta/member-of:%s' was removed successfully from device '%s'\n", deviceSetName, deviceName)
 			}
 		}
 	}
