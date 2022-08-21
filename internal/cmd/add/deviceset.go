@@ -31,6 +31,7 @@ func NewDeviceSetCmd() *cobra.Command {
 			// if devices prefix has not been specified, use deviceSetName as prefix
 			if deviceNamePrefix == "" {
 				deviceNamePrefix = deviceSetName
+				deviceNamePrefix = fmt.Sprintf("%s-device", deviceSetName)
 			}
 
 			client, err := resources.NewClient()
