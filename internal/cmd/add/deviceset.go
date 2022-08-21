@@ -9,13 +9,15 @@ import (
 	"os"
 )
 
-// deviceSetCmd represents the device set command
 var (
 	deviceSetName    string
 	deviceSetSize    int
 	deviceNamePrefix string
+)
 
-	deviceSetCmd = &cobra.Command{
+// NewDeviceSetCmd returns the device set command
+func NewDeviceSetCmd() *cobra.Command {
+	deviceSetCmd := &cobra.Command{
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
 		Short:   "Add a new device set with registered devices",
@@ -66,11 +68,6 @@ var (
 			return nil
 		},
 	}
-)
-
-func init() {
-	// subcommand of add
-	addCmd.AddCommand(deviceSetCmd)
 
 	// define command flags
 	deviceSetCmd.Flags().StringVarP(&deviceSetName, "name", "n", "", "name of the deviceset to add")
@@ -83,6 +80,13 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	return deviceSetCmd
+}
+
+func init() {
+	// subcommand of add
+	addCmd.AddCommand(NewDeviceSetCmd())
 }
 
 func NewDeviceToSet(deviceSetName, deviceName string) error {

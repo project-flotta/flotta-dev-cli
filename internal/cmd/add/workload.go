@@ -33,13 +33,15 @@ const (
 	defaultImage = "quay.io/project-flotta/nginx:1.21.6"
 )
 
-// workloadCmd represents the workload command
 var (
 	deviceID      string
 	workloadImage string
 	workloadName  string
+)
 
-	workloadCmd = &cobra.Command{
+// NewWorkloadCmd returns the workload command
+func NewWorkloadCmd() *cobra.Command {
+	workloadCmd := &cobra.Command{
 		Use:     "workload",
 		Aliases: []string{"workloads"},
 		Short:   "Add a new workload",
@@ -99,11 +101,6 @@ var (
 			return nil
 		},
 	}
-)
-
-func init() {
-	// subcommand of add
-	addCmd.AddCommand(workloadCmd)
 
 	// define command flags
 	workloadCmd.Flags().StringVarP(&deviceID, "device", "d", "", "device to run the workload on")
@@ -116,6 +113,13 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	return workloadCmd
+}
+
+func init() {
+	// subcommand of add
+	addCmd.AddCommand(NewWorkloadCmd())
 }
 
 func RandomSuffix() string {

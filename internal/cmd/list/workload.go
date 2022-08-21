@@ -28,65 +28,69 @@ import (
 	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 )
 
-// workloadCmd represents the workload command
-var workloadCmd = &cobra.Command{
-	Use:     "workload",
-	Aliases: []string{"workloads"},
-	Short:   "List workloads",
-	RunE: func(cmd *cobra.Command, args []string) error {
+// NewWorkloadCmd returns the workload command
+func NewWorkloadCmd() *cobra.Command {
+	workloadCmd := &cobra.Command{
+		Use:     "workload",
+		Aliases: []string{"workloads"},
+		Short:   "List workloads",
+		RunE: func(cmd *cobra.Command, args []string) error {
 
-		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
-		defer writer.Flush()
-		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
+			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
+			defer writer.Flush()
+			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
-			return err
-		}
-
-		// create a list of all registered devices
-		device, err := resources.NewEdgeDevice(client, "")
-		if err != nil {
-			fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
-		}
-		devicesList, err := device.List()
-		if err != nil {
-			fmt.Printf("List() device failed: %v\n", err)
-		}
-
-		// loop over registered devices
-		for _, dvc := range devicesList.Items {
-			device, err := resources.NewEdgeDevice(client, dvc.Name)
+			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
-			// get workloads by device
-			registeredDevice, err := device.Get()
+			// create a list of all registered devices
+			device, err := resources.NewEdgeDevice(client, "")
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Get device failed: %v\n", err)
-				return err
+				fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
 			}
-			workloads := registeredDevice.Status.Workloads
-			for _, workload := range workloads {
-				createdTime, err := getWorkloadCreationTime(workload.Name)
+			devicesList, err := device.List()
+			if err != nil {
+				fmt.Printf("List() device failed: %v\n", err)
+			}
+
+			// loop over registered devices
+			for _, dvc := range devicesList.Items {
+				device, err := resources.NewEdgeDevice(client, dvc.Name)
 				if err != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "getWorkloadCreationTime failed: %v\n", err)
+					fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 					return err
 				}
-				formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
-				fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
+
+				// get workloads by device
+				registeredDevice, err := device.Get()
+				if err != nil {
+					fmt.Fprintf(cmd.OutOrStderr(), "Get device failed: %v\n", err)
+					return err
+				}
+				workloads := registeredDevice.Status.Workloads
+				for _, workload := range workloads {
+					createdTime, err := getWorkloadCreationTime(workload.Name)
+					if err != nil {
+						fmt.Fprintf(cmd.OutOrStderr(), "getWorkloadCreationTime failed: %v\n", err)
+						return err
+					}
+					formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
+					fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
+				}
 			}
-		}
-		return nil
-	},
+			return nil
+		},
+	}
+
+	return workloadCmd
 }
 
 func init() {
 	// subcommand of list
-	listCmd.AddCommand(workloadCmd)
+	listCmd.AddCommand(NewWorkloadCmd())
 }
 
 func getWorkloadCreationTime(name string) (time.Time, error) {

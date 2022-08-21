@@ -23,10 +23,14 @@ import (
 )
 
 // deleteCmd represents the delete command
-var deleteCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "Delete a flotta resource",
-	Long:  `Use the delete command to delete a flotta resource, such as edgedevice or edgeworkload`,
+var deleteCmd = NewDeleteCmd()
+
+func NewDeleteCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete",
+		Short: "Delete a flotta resource",
+		Long:  `Use the delete command to delete a flotta resource, such as edgedevice or edgeworkload`,
+	}
 }
 
 func init() {

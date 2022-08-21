@@ -29,53 +29,57 @@ import (
 	"time"
 )
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:     "device",
-	Aliases: []string{"devices"},
-	Short:   "List devices",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := context.Background()
-		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClientWithOpts failed: %v\n", err)
-			return err
-		}
+// NewDeviceCmd returns the device command
+func NewDeviceCmd() *cobra.Command {
+	deviceCmd := &cobra.Command{
+		Use:     "device",
+		Aliases: []string{"devices"},
+		Short:   "List devices",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := context.Background()
+			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClientWithOpts failed: %v\n", err)
+				return err
+			}
 
-		// list of containers that contain the label flotta
-		filter := filters.Arg("label", "flotta")
-		opts := types.ContainerListOptions{All: true, Filters: filters.NewArgs(filter)}
+			// list of containers that contain the label flotta
+			filter := filters.Arg("label", "flotta")
+			opts := types.ContainerListOptions{All: true, Filters: filters.NewArgs(filter)}
 
-		containers, err := cli.ContainerList(ctx, opts)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "ContainerList failed: %v\n", err)
-			return err
-		}
+			containers, err := cli.ContainerList(ctx, opts)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "ContainerList failed: %v\n", err)
+				return err
+			}
 
-		// sort containers by container name
-		sort.Slice(containers, func(i, j int) bool {
-			return containers[i].Names[0] < containers[j].Names[0]
-		})
+			// sort containers by container name
+			sort.Slice(containers, func(i, j int) bool {
+				return containers[i].Names[0] < containers[j].Names[0]
+			})
 
-		writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
+			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
 
-		defer writer.Flush()
+			defer writer.Flush()
 
-		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
+			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 
-		for _, container := range containers {
-			containerName := container.Names[0][1:]
-			createdAt := time.Unix(container.Created, 0)
-			runningFor := units.HumanDuration(time.Now().UTC().Sub(createdAt)) + " ago"
+			for _, container := range containers {
+				containerName := container.Names[0][1:]
+				createdAt := time.Unix(container.Created, 0)
+				runningFor := units.HumanDuration(time.Now().UTC().Sub(createdAt)) + " ago"
 
-			fmt.Fprintf(writer, "%s\t%v\t%s\t\n", containerName, container.State, runningFor)
-		}
+				fmt.Fprintf(writer, "%s\t%v\t%s\t\n", containerName, container.State, runningFor)
+			}
 
-		return nil
-	},
+			return nil
+		},
+	}
+
+	return deviceCmd
 }
 
 func init() {
 	// subcommand of list
-	listCmd.AddCommand(deviceCmd)
+	listCmd.AddCommand(NewDeviceCmd())
 }

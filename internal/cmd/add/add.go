@@ -22,10 +22,14 @@ import (
 )
 
 // addCmd represents the add command
-var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "Add a new flotta resource",
-	Long:  `Use the add command to add a flotta resource, such as edgedevice or edgeworkload`,
+var addCmd = NewAddCmd()
+
+func NewAddCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "add",
+		Short: "Add a new flotta resource",
+		Long:  `Use the add command to add a flotta resource, such as edgedevice or edgeworkload`,
+	}
 }
 
 func init() {

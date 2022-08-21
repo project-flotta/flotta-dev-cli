@@ -28,10 +28,14 @@ import (
 var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
-	Use:   "flotta",
-	Short: "CLI for project-flotta.io",
-	Long:  `CLI for project-flotta.io`,
+var RootCmd = NewRootCmd()
+
+func NewRootCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "flotta",
+		Short: "CLI for project-flotta.io",
+		Long:  `CLI for project-flotta.io`,
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

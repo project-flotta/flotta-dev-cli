@@ -27,44 +27,41 @@ import (
 
 var deviceName string
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:     "device",
-	Aliases: []string{"devices"},
-	Short:   "Delete a device from flotta",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
-			return err
-		}
+// NewDeviceCmd returns the device command
+func NewDeviceCmd() *cobra.Command {
+	deviceCmd := &cobra.Command{
+		Use:     "device",
+		Aliases: []string{"devices"},
+		Short:   "Delete a device from flotta",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := resources.NewClient()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+				return err
+			}
 
-		device, err := resources.NewEdgeDevice(client, deviceName)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
-			return err
-		}
+			device, err := resources.NewEdgeDevice(client, deviceName)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				return err
+			}
 
-		err = device.Unregister()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "Unregister failed: %v\n", err)
-			return err
-		}
+			err = device.Unregister()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "Unregister failed: %v\n", err)
+				return err
+			}
 
-		err = device.Remove()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "Remove failed: %v\n", err)
-			return err
-		}
+			err = device.Remove()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "Remove failed: %v\n", err)
+				return err
+			}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "device '%v' was deleted \n", device.GetName())
-		return nil
-	},
-}
-
-func init() {
-	// subcommand of delete
-	deleteCmd.AddCommand(deviceCmd)
+			fmt.Fprintf(cmd.OutOrStdout(), "device '%v' was deleted \n", device.GetName())
+			return nil
+		},
+	}
 
 	// define command flags
 	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to delete")
@@ -73,4 +70,11 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	return deviceCmd
+}
+
+func init() {
+	// subcommand of delete
+	deleteCmd.AddCommand(NewDeviceCmd())
 }
