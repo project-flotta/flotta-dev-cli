@@ -26,38 +26,35 @@ import (
 
 var workloadName string
 
-// workloadCmd represents the workload command
-var workloadCmd = &cobra.Command{
-	Use:     "workload",
-	Aliases: []string{"workloads"},
-	Short:   "Delete a workload from flotta",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
-			return err
-		}
+// NewWorkloadCmd returns the workload command
+func NewWorkloadCmd() *cobra.Command {
+	workloadCmd := &cobra.Command{
+		Use:     "workload",
+		Aliases: []string{"workloads"},
+		Short:   "Delete a workload from flotta",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := resources.NewClient()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+				return err
+			}
 
-		workload, err := resources.NewEdgeWorkload(client)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
-			return err
-		}
+			workload, err := resources.NewEdgeWorkload(client)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
+				return err
+			}
 
-		err = workload.Remove(workloadName)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "Remove workload failed: %v\n", err)
-			return err
-		}
+			err = workload.Remove(workloadName)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "Remove workload failed: %v\n", err)
+				return err
+			}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "workload '%v' was deleted \n", workloadName)
-		return nil
-	},
-}
-
-func init() {
-	// subcommand of delete
-	deleteCmd.AddCommand(workloadCmd)
+			fmt.Fprintf(cmd.OutOrStdout(), "workload '%v' was deleted \n", workloadName)
+			return nil
+		},
+	}
 
 	// define command flags
 	workloadCmd.Flags().StringVarP(&workloadName, "name", "n", "", "name of the workload to delete")
@@ -66,4 +63,11 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	return workloadCmd
+}
+
+func init() {
+	// subcommand of delete
+	deleteCmd.AddCommand(NewWorkloadCmd())
 }

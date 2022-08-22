@@ -26,37 +26,34 @@ import (
 
 var deviceName string
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:     "device",
-	Aliases: []string{"devices"},
-	Short:   "Stop a device",
-	Run: func(cmd *cobra.Command, args []string) {
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Printf("NewClient failed: %v\n", err)
-			return
-		}
+// NewDeviceCmd returns the device command
+func NewDeviceCmd() *cobra.Command {
+	deviceCmd := &cobra.Command{
+		Use:     "device",
+		Aliases: []string{"devices"},
+		Short:   "Stop a device",
+		Run: func(cmd *cobra.Command, args []string) {
+			client, err := resources.NewClient()
+			if err != nil {
+				fmt.Printf("NewClient failed: %v\n", err)
+				return
+			}
 
-		device, err := resources.NewEdgeDevice(client, deviceName)
-		if err != nil {
-			fmt.Printf("NewEdgeDevice failed: %v\n", err)
-			return
-		}
+			device, err := resources.NewEdgeDevice(client, deviceName)
+			if err != nil {
+				fmt.Printf("NewEdgeDevice failed: %v\n", err)
+				return
+			}
 
-		err = device.Stop()
-		if err != nil {
-			fmt.Printf("Stop failed: %v\n", err)
-			return
-		}
+			err = device.Stop()
+			if err != nil {
+				fmt.Printf("Stop failed: %v\n", err)
+				return
+			}
 
-		fmt.Printf("edgedevice '%v' was stopped \n", device.GetName())
-	},
-}
-
-func init() {
-	// subcommand of stop
-	stopCmd.AddCommand(deviceCmd)
+			fmt.Printf("edgedevice '%v' was stopped \n", device.GetName())
+		},
+	}
 
 	// define command flags
 	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to stop")
@@ -65,4 +62,11 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+
+	return deviceCmd
+}
+
+func init() {
+	// subcommand of stop
+	stopCmd.AddCommand(NewDeviceCmd())
 }

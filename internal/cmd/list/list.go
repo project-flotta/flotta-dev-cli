@@ -22,10 +22,14 @@ import (
 )
 
 // listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List flotta resources",
-	Long:  `Use the list command to list all the flotta resources that match the specified type.`,
+var listCmd = NewListCmd()
+
+func NewListCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "list",
+		Short: "List flotta resources",
+		Long:  `Use the list command to list all the flotta resources that match the specified type.`,
+	}
 }
 
 func init() {

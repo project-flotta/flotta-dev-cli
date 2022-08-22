@@ -23,10 +23,14 @@ import (
 )
 
 // stopCmd represents the stop command
-var stopCmd = &cobra.Command{
-	Use:   "stop",
-	Short: "Stop a flotta resource",
-	Long:  `Use the stop command to stop a flotta resource, such as edgedevice`,
+var stopCmd = NewStopCmd()
+
+func NewStopCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "stop",
+		Short: "Stop a flotta resource",
+		Long:  `Use the stop command to stop a flotta resource, such as edgedevice`,
+	}
 }
 
 func init() {

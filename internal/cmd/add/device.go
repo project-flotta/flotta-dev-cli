@@ -18,53 +18,50 @@ package add
 
 import (
 	"fmt"
+	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"os"
 
-	"github.com/project-flotta/flotta-dev-cli/internal/resources"
 	"github.com/spf13/cobra"
 )
 
 var deviceName string
 
-// deviceCmd represents the device command
-var deviceCmd = &cobra.Command{
-	Use:     "device",
-	Aliases: []string{"devices"},
-	Short:   "Add a new device",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
-			return err
-		}
-
-		device, err := resources.NewEdgeDevice(client, deviceName)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
-			return err
-		}
-
-		err = device.Register()
-		if err != nil {
-			// if device.Register() failed, remove the container
-			err2 := device.Remove()
-			if err2 != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Remove device that failed to register failed: %v\n", err2)
+// NewDeviceCmd returns the device command
+func NewDeviceCmd() *cobra.Command {
+	deviceCmd := &cobra.Command{
+		Use:     "device",
+		Aliases: []string{"devices"},
+		Short:   "Add a new device",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := resources.NewClient()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
-			fmt.Fprintf(cmd.OutOrStderr(), "Register device failed: %v\n", err)
-			return err
-		}
+			device, err := resources.NewEdgeDevice(client, deviceName)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				return err
+			}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "device '%s' was added\n", device.GetName())
-		return nil
-	},
-}
+			err = device.Register()
+			if err != nil {
+				// if device.Register() failed, remove the container
+				err2 := device.Remove()
+				if err2 != nil {
+					fmt.Fprintf(cmd.OutOrStderr(), "Remove device that failed to register failed: %v\n", err2)
+					return err
+				}
 
-func init() {
-	// subcommand of add
-	addCmd.AddCommand(deviceCmd)
+				fmt.Fprintf(cmd.OutOrStderr(), "Register device failed: %v\n", err)
+				return err
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "device '%s' was added\n", device.GetName())
+			return nil
+		},
+	}
 
 	// define command flags
 	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to add")
@@ -73,4 +70,10 @@ func init() {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
 		os.Exit(1)
 	}
+	return deviceCmd
+}
+
+func init() {
+	// subcommand of add
+	addCmd.AddCommand(NewDeviceCmd())
 }

@@ -23,10 +23,14 @@ import (
 )
 
 // startCmd represents the start command
-var startCmd = &cobra.Command{
-	Use:   "start",
-	Short: "Start a flotta resource",
-	Long:  `Use the start command to start a flotta resource, such as edgedevice`,
+var startCmd = NewStartCmd()
+
+func NewStartCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "start",
+		Short: "Start a flotta resource",
+		Long:  `Use the start command to start a flotta resource, such as edgedevice`,
+	}
 }
 
 func init() {

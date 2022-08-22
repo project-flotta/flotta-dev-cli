@@ -33,51 +33,48 @@ import (
 var deviceSetName string
 var deleteDevices bool
 
-// deviceSetCmd represents the deviceset command
-var deviceSetCmd = &cobra.Command{
-	Use:     "deviceset",
-	Aliases: []string{"devicesets"},
-	Short:   "Delete a deviceset from flotta",
-	RunE: func(cmd *cobra.Command, args []string) error{
-		client, err := resources.NewClient()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
-			return err
-		}
-
-		deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
-			return err
-		}
-
-		err = deviceset.Remove(deviceSetName)
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "Remove deviceset failed: %v\n", err)
-			return err
-		}
-
-		fmt.Fprintf(cmd.OutOrStdout(), "deviceset '%v' was deleted \n", deviceSetName)
-
-		devices, err := getDevicesNamesList()
-		if err != nil {
-			fmt.Fprintf(cmd.OutOrStderr(), "getDevicesList failed: %v\n", err)
-			return err
-		}
-
-		for _, deviceName := range devices {
-			err := updateDeviceAfterSetDeletion(deviceName, cmd)
+// NewDeviceSetCommand return the deviceset command
+func NewDeviceSetCommand() *cobra.Command {
+	deviceSetCmd := &cobra.Command{
+		Use:     "deviceset",
+		Aliases: []string{"devicesets"},
+		Short:   "Delete a deviceset from flotta",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "updateDeviceAfterSetDeletion failed: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+				return err
 			}
-		}
-		return nil
-	},
-}
 
-func init() {
-	// subcommand of delete
-	deleteCmd.AddCommand(deviceSetCmd)
+			deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+				return err
+			}
+
+			err = deviceset.Remove(deviceSetName)
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "Remove deviceset failed: %v\n", err)
+				return err
+			}
+
+			fmt.Fprintf(cmd.OutOrStdout(), "deviceset '%v' was deleted \n", deviceSetName)
+
+			devices, err := getDevicesNamesList()
+			if err != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "getDevicesList failed: %v\n", err)
+				return err
+			}
+
+			for _, deviceName := range devices {
+				err := updateDeviceAfterSetDeletion(deviceName, cmd)
+				if err != nil {
+					fmt.Fprintf(cmd.OutOrStderr(), "updateDeviceAfterSetDeletion failed: %v\n", err)
+				}
+			}
+			return nil
+		},
+	}
 
 	// define command flags
 	deviceSetCmd.Flags().StringVarP(&deviceSetName, "name", "n", "", "name of the device-set to delete")
@@ -94,6 +91,13 @@ func init() {
 	if deviceSetCmd.Flags().Lookup("all").Changed {
 		deleteDevices = true
 	}
+
+	return deviceSetCmd
+}
+
+func init() {
+	// subcommand of delete
+	deleteCmd.AddCommand(NewDeviceSetCommand())
 }
 
 func getDevicesNamesList() ([]string, error) {
