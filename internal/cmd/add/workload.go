@@ -110,7 +110,7 @@ func NewWorkloadCmd() *cobra.Command {
 	// mark device flag as required
 	err := workloadCmd.MarkFlagRequired("device")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to set flag `device` as required: %v\n", err)
 		os.Exit(1)
 	}
 
