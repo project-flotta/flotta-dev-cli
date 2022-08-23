@@ -19,9 +19,9 @@ package add
 import (
 	"fmt"
 	"github.com/project-flotta/flotta-dev-cli/internal/resources"
-	"os"
-
 	"github.com/spf13/cobra"
+	"os"
+	"strings"
 )
 
 var deviceName string
@@ -44,6 +44,18 @@ func NewDeviceCmd() *cobra.Command {
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 				return err
+			}
+
+			dvc, err := device.Get()
+			if err == nil && dvc != nil {
+				fmt.Fprintf(cmd.OutOrStderr(), "failed: device '%s' already exists\n", deviceName)
+				return fmt.Errorf("edgedevices.management.project-flotta.io \"%s\" already exists", deviceName)
+			} else {
+				errSubstring := fmt.Sprintf("edgedevices.management.project-flotta.io \"%s\" not found", deviceName)
+				if !strings.Contains(err.Error(), errSubstring) {
+					fmt.Fprintf(cmd.OutOrStderr(), "failed: %v\n", err)
+					return err
+				}
 			}
 
 			err = device.Register()
