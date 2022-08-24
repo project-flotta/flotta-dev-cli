@@ -32,26 +32,27 @@ func NewDeviceCmd() *cobra.Command {
 		Use:     "device",
 		Aliases: []string{"devices"},
 		Short:   "Stop a device",
-		Run: func(cmd *cobra.Command, args []string) {
+		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Printf("NewClient failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
+				return err
 			}
 
 			device, err := resources.NewEdgeDevice(client, deviceName)
 			if err != nil {
-				fmt.Printf("NewEdgeDevice failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
+				return err
 			}
 
 			err = device.Stop()
 			if err != nil {
-				fmt.Printf("Stop failed: %v\n", err)
-				return
+				fmt.Fprintf(cmd.OutOrStderr(), "Stop failed: %v\n", err)
+				return err
 			}
 
-			fmt.Printf("edgedevice '%v' was stopped \n", device.GetName())
+			fmt.Fprintf(cmd.OutOrStdout(), "device '%v' was stopped \n", device.GetName())
+			return nil
 		},
 	}
 
