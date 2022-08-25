@@ -18,7 +18,6 @@ limitations under the License.
 
 import (
 	"fmt"
-	"os"
 	"text/tabwriter"
 	"time"
 
@@ -36,7 +35,7 @@ func NewWorkloadCmd() *cobra.Command {
 		Short:   "List workloads",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
-			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 2, '\t', tabwriter.AlignRight)
+			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
 			defer writer.Flush()
 			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 
@@ -49,11 +48,11 @@ func NewWorkloadCmd() *cobra.Command {
 			// create a list of all registered devices
 			device, err := resources.NewEdgeDevice(client, "")
 			if err != nil {
-				fmt.Printf("NewEdgeDeviceSet failed: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
 			}
 			devicesList, err := device.List()
 			if err != nil {
-				fmt.Printf("List() device failed: %v\n", err)
+				fmt.Fprintf(cmd.OutOrStderr(), "List() device failed: %v\n", err)
 			}
 
 			// loop over registered devices
