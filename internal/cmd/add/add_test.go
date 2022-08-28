@@ -49,30 +49,30 @@ var _ = Describe("Add", func() {
 
 		AfterAll(func() {
 			client, err := resources.NewClient()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			// remove test device and workload
 			device, err := resources.NewEdgeDevice(client, deviceName)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			dvc, err := device.Get()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			workloads := dvc.Status.Workloads
 			for _, w := range workloads {
 				workload, err := resources.NewEdgeWorkload(client)
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 				err = workload.Remove(w.Name)
-				Expect(err).To(BeNil())
+				Expect(err).NotTo(HaveOccurred())
 			}
 
 			err = device.Remove()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			// remove test device-set
 			deviceset, err := resources.NewEdgeDeviceSet(client, setName)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 			err = deviceset.Remove(setName)
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should add a new device", func() {
@@ -81,7 +81,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			// then
 			Expect(actualOut.String()).To(Equal(fmt.Sprintf("device '%s' was added\n", deviceName)))
@@ -94,7 +94,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			// then
 			Expect(actualOut.String()).To(Equal(fmt.Sprintf("workload '%s' was added to device '%s'\n", workloadName, deviceName)))
@@ -107,7 +107,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).To(BeNil())
+			Expect(err).NotTo(HaveOccurred())
 
 			// then
 			Expect(actualOut.String()).To(Equal(fmt.Sprintf("device-set '%s' was added\n", setName)))
@@ -142,7 +142,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(HaveOccurred())
 
 			// then
 			Expect(actualErr.String()).To(Equal("Error: required flag(s) \"name\" not set\n"))
@@ -154,7 +154,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(HaveOccurred())
 
 			// then
 			Expect(actualErr.String()).To(Equal("Error: required flag(s) \"device\" not set\n"))
@@ -166,7 +166,7 @@ var _ = Describe("Add", func() {
 
 			// when
 			err := rootCmd.Execute()
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(HaveOccurred())
 
 			// then
 			Expect(actualErr.String()).To(Equal("Error: required flag(s) \"name\" not set\n"))
