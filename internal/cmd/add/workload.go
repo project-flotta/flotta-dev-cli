@@ -45,6 +45,7 @@ func NewWorkloadCmd() *cobra.Command {
 		Use:     "workload",
 		Aliases: []string{"workloads"},
 		Short:   "Add a new workload",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if workloadImage == "" {
 				workloadImage = defaultImage

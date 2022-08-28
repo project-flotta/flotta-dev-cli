@@ -39,6 +39,7 @@ func NewDeviceSetCommand() *cobra.Command {
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
 		Short:   "Delete a deviceset from flotta",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {

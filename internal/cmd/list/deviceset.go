@@ -33,6 +33,7 @@ func NewDeviceSetCmd() *cobra.Command {
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
 		Short:   "List device-sets",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)

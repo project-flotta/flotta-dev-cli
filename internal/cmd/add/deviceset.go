@@ -21,6 +21,7 @@ func NewDeviceSetCmd() *cobra.Command {
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
 		Short:   "Add a new device set with registered devices",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if deviceSetSize < 0 {
 				err := fmt.Errorf("deviceSetSize is invalid: %d. Only positive values are allowed", deviceSetSize)
