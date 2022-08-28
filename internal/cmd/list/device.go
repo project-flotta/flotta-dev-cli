@@ -59,10 +59,15 @@ func NewDeviceCmd() *cobra.Command {
 			})
 
 			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
-
 			defer writer.Flush()
 
-			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
+			// if there are no devices, print a message and return
+			if len(containers) == 0 {
+				fmt.Fprintf(cmd.OutOrStdout(), "No resources were found.\n")
+				return nil
+			} else {
+				fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
+			}
 
 			for _, container := range containers {
 				containerName := container.Names[0][1:]

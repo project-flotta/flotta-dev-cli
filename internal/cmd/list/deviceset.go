@@ -34,11 +34,6 @@ func NewDeviceSetCmd() *cobra.Command {
 		Aliases: []string{"devicesets"},
 		Short:   "List device-sets",
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
-			defer writer.Flush()
-			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "DEVICES", "CREATED")
-
 			client, err := resources.NewClient()
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
@@ -55,6 +50,17 @@ func NewDeviceSetCmd() *cobra.Command {
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "List() device-set failed: %v\n", err)
 				return err
+			}
+
+			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
+			defer writer.Flush()
+
+			// if there are no device-sets, print a message and return
+			if len(setsList.Items) == 0 {
+				fmt.Fprintf(cmd.OutOrStderr(), "No resources were found.\n")
+				return nil
+			} else {
+				fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "DEVICES", "CREATED")
 			}
 
 			// create a list of all registered devices
