@@ -32,6 +32,7 @@ func NewWorkloadCmd() *cobra.Command {
 		Use:     "workload",
 		Aliases: []string{"workloads"},
 		Short:   "Delete a workload from flotta",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {

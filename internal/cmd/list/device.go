@@ -35,6 +35,7 @@ func NewDeviceCmd() *cobra.Command {
 		Use:     "device",
 		Aliases: []string{"devices"},
 		Short:   "List devices",
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.Background()
 			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
