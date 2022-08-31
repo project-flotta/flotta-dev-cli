@@ -35,11 +35,6 @@ func NewWorkloadCmd() *cobra.Command {
 		Short:   "List workloads",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
-			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
-			defer writer.Flush()
-			fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
-
 			client, err := resources.NewClient()
 			if err != nil {
 				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
@@ -56,7 +51,11 @@ func NewWorkloadCmd() *cobra.Command {
 				fmt.Fprintf(cmd.OutOrStderr(), "List() device failed: %v\n", err)
 			}
 
+			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
+			defer writer.Flush()
+
 			// loop over registered devices
+			foundWorkload := false
 			for _, dvc := range devicesList.Items {
 				device, err := resources.NewEdgeDevice(client, dvc.Name)
 				if err != nil {
@@ -72,6 +71,10 @@ func NewWorkloadCmd() *cobra.Command {
 				}
 				workloads := registeredDevice.Status.Workloads
 				for _, workload := range workloads {
+					if !foundWorkload {
+						foundWorkload = true
+						fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
+					}
 					createdTime, err := getWorkloadCreationTime(workload.Name)
 					if err != nil {
 						fmt.Fprintf(cmd.OutOrStderr(), "getWorkloadCreationTime failed: %v\n", err)
@@ -80,6 +83,11 @@ func NewWorkloadCmd() *cobra.Command {
 					formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
 					fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
 				}
+			}
+
+			// if there are no workloads, print a message
+			if !foundWorkload {
+				fmt.Fprintf(cmd.OutOrStderr(), "No resources were found.\n")
 			}
 			return nil
 		},
