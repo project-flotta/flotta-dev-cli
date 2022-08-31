@@ -21,7 +21,7 @@ var _ = Describe("Start", func() {
 		actualOut *bytes.Buffer
 		actualErr *bytes.Buffer
 		rootCmd   *cobra.Command
-		startCmd   *cobra.Command
+		startCmd  *cobra.Command
 	)
 
 	BeforeEach(func() {

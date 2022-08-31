@@ -4,10 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/docker/docker/pkg/archive"
 	"io"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 	"unicode"
@@ -15,7 +19,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/archive"
 	"github.com/project-flotta/flotta-operator/api/v1alpha1"
 	"github.com/project-flotta/flotta-operator/generated/clientset/versioned"
 	mgmtv1alpha1 "github.com/project-flotta/flotta-operator/generated/clientset/versioned/typed/v1alpha1"
@@ -24,16 +27,12 @@ import (
 )
 
 var (
-	certsPath         = "/etc/pki/consumer"
-	CACertsPath       = filepath.Join(certsPath, "ca.pem")
-	clientCertPath    = filepath.Join(certsPath, "cert.pem")
-	clientKeyPath     = filepath.Join(certsPath, "key.pem")
-	certificates      = []string{CACertsPath, clientKeyPath, clientCertPath}
-	localCertificates = []string{
-		"/tmp/ca.pem",
-		"/tmp/cert.pem",
-		"/tmp/key.pem",
-	}
+	certsPath      = "/etc/pki/consumer"
+	CACertsPath    = filepath.Join(certsPath, "ca.pem")
+	clientCertPath = filepath.Join(certsPath, "cert.pem")
+	clientKeyPath  = filepath.Join(certsPath, "key.pem")
+	certificates   = []string{CACertsPath, clientKeyPath, clientCertPath}
+	certsMap       = make(map[string][]byte)
 )
 
 const (
@@ -181,9 +180,21 @@ func (e *edgeDevice) Remove() error {
 }
 
 func (e *edgeDevice) CopyCerts() error {
+	dir, err := os.MkdirTemp("", "certs")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(dir) // clean up
+
+	err = CopyCertsToTempDir(dir)
+	if err != nil {
+		return err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	for _, certificatePath := range localCertificates {
+
+	for certificatePath := range certsMap {
 		if _, err := os.Stat(certificatePath); errors.Is(err, os.ErrNotExist) {
 			return err
 		}
@@ -205,6 +216,47 @@ func (e *edgeDevice) CopyCerts() error {
 
 	if _, err := e.Exec(fmt.Sprintf("echo 'ca-root = [\"%v\"]' >> /etc/yggdrasil/config.toml", CACertsPath)); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func CopyCertsToTempDir(dir string) error {
+	// get secrets
+	config, err := GetKubeConfig()
+	if err != nil {
+		return err
+	}
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+
+	CASecret, err := clientset.CoreV1().Secrets("flotta").Get(context.TODO(), "flotta-ca", metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+	secrets, err := clientset.CoreV1().Secrets("flotta").List(context.TODO(), metav1.ListOptions{LabelSelector: "reg-client-ca=true"})
+	if err != nil {
+		return err
+	}
+
+	// sort secrets by creation time
+	data := secrets.Items
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].CreationTimestamp.Before(&data[j].CreationTimestamp)
+	})
+	regSecret := data[len(data)-1]
+
+	// save secrets to files
+	certsMap[filepath.Join(dir, "ca.pem")] = CASecret.Data["ca.crt"]
+	certsMap[filepath.Join(dir, "cert.pem")] = regSecret.Data["client.crt"]
+	certsMap[filepath.Join(dir, "key.pem")] = regSecret.Data["client.key"]
+
+	for path, data := range certsMap {
+		if err := os.WriteFile(path, data, 0666); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -264,11 +316,7 @@ func (e *edgeDevice) WaitForWorkloadState(workloadName string, workloadPhase v1a
 }
 
 func NewClient() (mgmtv1alpha1.ManagementV1alpha1Interface, error) {
-	homedir, err := os.UserHomeDir()
-	if err != nil {
-		return nil, err
-	}
-	config, err := clientcmd.BuildConfigFromFlags("", path.Join(homedir, ".kube/config"))
+	config, err := GetKubeConfig()
 	if err != nil {
 		return nil, err
 	}
@@ -277,4 +325,16 @@ func NewClient() (mgmtv1alpha1.ManagementV1alpha1Interface, error) {
 		return nil, err
 	}
 	return clientset.ManagementV1alpha1(), nil
+}
+
+func GetKubeConfig() (*rest.Config, error) {
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	config, err := clientcmd.BuildConfigFromFlags("", path.Join(homedir, ".kube/config"))
+	if err != nil {
+		return nil, fmt.Errorf("cannot get kube config from path '%s': %v", path.Join(homedir, ".kube/config"), err)
+	}
+	return config, nil
 }
