@@ -33,8 +33,8 @@ import (
 var deviceSetName string
 var deleteDevices bool
 
-// NewDeviceSetCommand return the deviceset command
-func NewDeviceSetCommand() *cobra.Command {
+// NewDeviceSetCmd return the deviceset command
+func NewDeviceSetCmd() *cobra.Command {
 	deviceSetCmd := &cobra.Command{
 		Use:     "deviceset",
 		Aliases: []string{"devicesets"},
@@ -98,7 +98,7 @@ func NewDeviceSetCommand() *cobra.Command {
 
 func init() {
 	// subcommand of delete
-	deleteCmd.AddCommand(NewDeviceSetCommand())
+	deleteCmd.AddCommand(NewDeviceSetCmd())
 }
 
 func getDevicesNamesList() ([]string, error) {
