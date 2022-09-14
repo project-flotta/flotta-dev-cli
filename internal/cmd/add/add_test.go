@@ -12,7 +12,7 @@ import (
 	. "github.com/project-flotta/flotta-dev-cli/internal/cmd/add"
 )
 
-var _ = Describe("Add", func() {
+var _ = Describe("Add", Ordered, func() {
 	var (
 		actualOut *bytes.Buffer
 		actualErr *bytes.Buffer
@@ -45,34 +45,6 @@ var _ = Describe("Add", func() {
 		AfterEach(func() {
 			actualOut.Reset()
 			actualErr.Reset()
-		})
-
-		AfterAll(func() {
-			client, err := resources.NewClient()
-			Expect(err).NotTo(HaveOccurred())
-
-			// remove test device and workload
-			device, err := resources.NewEdgeDevice(client, deviceName)
-			Expect(err).NotTo(HaveOccurred())
-			dvc, err := device.Get()
-			Expect(err).NotTo(HaveOccurred())
-
-			workloads := dvc.Status.Workloads
-			for _, w := range workloads {
-				workload, err := resources.NewEdgeWorkload(client)
-				Expect(err).NotTo(HaveOccurred())
-				err = workload.Remove(w.Name)
-				Expect(err).NotTo(HaveOccurred())
-			}
-
-			err = device.Remove()
-			Expect(err).NotTo(HaveOccurred())
-
-			// remove test device-set
-			deviceset, err := resources.NewEdgeDeviceSet(client, setName)
-			Expect(err).NotTo(HaveOccurred())
-			err = deviceset.Remove(setName)
-			Expect(err).NotTo(HaveOccurred())
 		})
 
 		It("should add a new device", func() {
@@ -112,6 +84,75 @@ var _ = Describe("Add", func() {
 			// then
 			Expect(actualOut.String()).To(Equal(fmt.Sprintf("device-set '%s' was added\n", setName)))
 			Expect(actualErr.String()).To(BeEmpty())
+		})
+	})
+
+	Context("Add existing resources", Ordered, func() {
+		AfterAll(func() {
+			client, err := resources.NewClient()
+			Expect(err).NotTo(HaveOccurred())
+
+			// remove test device and workload
+			device, err := resources.NewEdgeDevice(client, deviceName)
+			Expect(err).NotTo(HaveOccurred())
+			dvc, err := device.Get()
+			Expect(err).NotTo(HaveOccurred())
+
+			workloads := dvc.Status.Workloads
+			for _, w := range workloads {
+				workload, err := resources.NewEdgeWorkload(client)
+				Expect(err).NotTo(HaveOccurred())
+				err = workload.Remove(w.Name)
+				Expect(err).NotTo(HaveOccurred())
+			}
+
+			err = device.Remove()
+			Expect(err).NotTo(HaveOccurred())
+
+			// remove test device-set
+			deviceset, err := resources.NewEdgeDeviceSet(client, setName)
+			Expect(err).NotTo(HaveOccurred())
+			err = deviceset.Remove(setName)
+			Expect(err).NotTo(HaveOccurred())
+		})
+
+		AfterEach(func() {
+			actualOut.Reset()
+			actualErr.Reset()
+		})
+
+		It("should fail to add an existing device", func() {
+			// given
+			rootCmd.SetArgs([]string{"add", "device", "-n", deviceName})
+
+			// when
+			err := rootCmd.Execute()
+			Expect(err).To(HaveOccurred())
+
+			// then
+			Expect(actualErr.String()).To(Equal(fmt.Sprintf("Error: edgedevices.management.project-flotta.io \"%s\" already exists\n", deviceName)))
+		})
+		It("should fail to add an existing workload", func() {
+			// given
+			rootCmd.SetArgs([]string{"add", "workload", "-d", deviceName, "-n", workloadName})
+
+			// when
+			err := rootCmd.Execute()
+			Expect(err).To(HaveOccurred())
+
+			// then
+			Expect(actualErr.String()).To(Equal(fmt.Sprintf("Error: edgeworkloads.management.project-flotta.io \"%s\" already exists\n", workloadName)))
+		})
+		It("should fail to add an existing device-set", func() {
+			// given
+			rootCmd.SetArgs([]string{"add", "deviceset", "-n", setName})
+
+			// when
+			err := rootCmd.Execute()
+			Expect(err).To(HaveOccurred())
+
+			// then
+			Expect(actualErr.String()).To(Equal(fmt.Sprintf("Error: edgedevicesets.management.project-flotta.io \"%s\" already exists\n", setName)))
 		})
 	})
 
