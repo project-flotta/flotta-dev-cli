@@ -43,19 +43,16 @@ func NewDeviceSetCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
 				return err
 			}
 
 			err = deviceset.Remove(deviceSetName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Remove deviceset failed: %v\n", err)
 				return err
 			}
 
@@ -63,7 +60,6 @@ func NewDeviceSetCmd() *cobra.Command {
 
 			devices, err := getDevicesNamesList()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "getDevicesList failed: %v\n", err)
 				return err
 			}
 

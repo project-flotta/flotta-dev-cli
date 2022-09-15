@@ -37,19 +37,16 @@ func NewDeviceSetCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			// create a list of all device-sets
 			deviceset, err := resources.NewEdgeDeviceSet(client, "")
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
 				return err
 			}
 			setsList, err := deviceset.List()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "List() device-set failed: %v\n", err)
 				return err
 			}
 
@@ -67,12 +64,10 @@ func NewDeviceSetCmd() *cobra.Command {
 			// create a list of all registered devices
 			device, err := resources.NewEdgeDevice(client, "")
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
 				return err
 			}
 			devicesList, err := device.List()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "List() device failed: %v\n", err)
 				return err
 			}
 

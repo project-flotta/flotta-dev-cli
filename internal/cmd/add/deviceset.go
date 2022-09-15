@@ -25,7 +25,6 @@ func NewDeviceSetCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if deviceSetSize < 0 {
 				err := fmt.Errorf("deviceSetSize is invalid: %d. Only positive values are allowed", deviceSetSize)
-				fmt.Fprintf(cmd.OutOrStderr(), err.Error()+"\n")
 				return err
 			}
 
@@ -37,19 +36,16 @@ func NewDeviceSetCmd() *cobra.Command {
 
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed %v\n", err)
 				return err
 			}
 
 			deviceset, err := resources.NewEdgeDeviceSet(client, deviceSetName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
 				return err
 			}
 
 			_, err = deviceset.Create(resources.EdgeDeviceSetConfig(deviceSetName))
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Create device-set failed: %v\n", err)
 				return err
 			}
 

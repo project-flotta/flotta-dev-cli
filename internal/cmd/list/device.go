@@ -40,7 +40,6 @@ func NewDeviceCmd() *cobra.Command {
 			ctx := context.Background()
 			cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClientWithOpts failed: %v\n", err)
 				return err
 			}
 
@@ -50,7 +49,6 @@ func NewDeviceCmd() *cobra.Command {
 
 			containers, err := cli.ContainerList(ctx, opts)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "ContainerList failed: %v\n", err)
 				return err
 			}
 
