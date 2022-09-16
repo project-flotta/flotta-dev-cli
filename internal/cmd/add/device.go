@@ -36,24 +36,20 @@ func NewDeviceCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			device, err := resources.NewEdgeDevice(client, deviceName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 				return err
 			}
 
 			dvc, err := device.Get()
 			if err == nil && dvc != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "failed: device '%s' already exists\n", deviceName)
 				return fmt.Errorf("edgedevices.management.project-flotta.io \"%s\" already exists", deviceName)
 			} else {
 				errSubstring := fmt.Sprintf("edgedevices.management.project-flotta.io \"%s\" not found", deviceName)
 				if !strings.Contains(err.Error(), errSubstring) {
-					fmt.Fprintf(cmd.OutOrStderr(), "failed: %v\n", err)
 					return err
 				}
 			}
@@ -63,11 +59,9 @@ func NewDeviceCmd() *cobra.Command {
 				// if device.Register() failed, remove the container
 				err2 := device.Remove()
 				if err2 != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "Remove device that failed to register failed: %v\n", err2)
-					return err
+					return err2
 				}
 
-				fmt.Fprintf(cmd.OutOrStderr(), "Register device failed: %v\n", err)
 				return err
 			}
 

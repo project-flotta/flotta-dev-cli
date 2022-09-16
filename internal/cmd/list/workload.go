@@ -37,18 +37,17 @@ func NewWorkloadCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			// create a list of all registered devices
 			device, err := resources.NewEdgeDevice(client, "")
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDeviceSet failed: %v\n", err)
+				return err
 			}
 			devicesList, err := device.List()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "List() device failed: %v\n", err)
+				return err
 			}
 
 			writer := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 8, 2, '\t', tabwriter.AlignRight)
@@ -59,14 +58,12 @@ func NewWorkloadCmd() *cobra.Command {
 			for _, dvc := range devicesList.Items {
 				device, err := resources.NewEdgeDevice(client, dvc.Name)
 				if err != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 					return err
 				}
 
 				// get workloads by device
 				registeredDevice, err := device.Get()
 				if err != nil {
-					fmt.Fprintf(cmd.OutOrStderr(), "Get device failed: %v\n", err)
 					return err
 				}
 				workloads := registeredDevice.Status.Workloads
@@ -77,7 +74,6 @@ func NewWorkloadCmd() *cobra.Command {
 					}
 					createdTime, err := getWorkloadCreationTime(workload.Name)
 					if err != nil {
-						fmt.Fprintf(cmd.OutOrStderr(), "getWorkloadCreationTime failed: %v\n", err)
 						return err
 					}
 					formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"

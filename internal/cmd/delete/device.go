@@ -37,25 +37,21 @@ func NewDeviceCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			device, err := resources.NewEdgeDevice(client, deviceName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 				return err
 			}
 
 			err = device.Unregister()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Unregister failed: %v\n", err)
 				return err
 			}
 
 			err = device.Remove()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Remove failed: %v\n", err)
 				return err
 			}
 

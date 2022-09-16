@@ -55,7 +55,6 @@ func NewWorkloadCmd() *cobra.Command {
 			splitImage := strings.Split(workloadImage, "/")
 			normalizedImage, error := NormalizeString(splitImage[len(splitImage)-1])
 			if error != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "image: %s contains invalid characters\n", workloadImage)
 				return error
 			}
 
@@ -65,36 +64,30 @@ func NewWorkloadCmd() *cobra.Command {
 
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			device, err := resources.NewEdgeDevice(client, deviceID)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeDevice failed: %v\n", err)
 				return err
 			}
 
 			_, err = device.Get()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Get device '%s' failed: %v\n", deviceID, err)
 				return err
 			}
 			workload, err := resources.NewEdgeWorkload(client)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
 				return err
 			}
 
 			_, err = workload.Create(resources.EdgeworkloadDeviceId(workloadName, deviceID, workloadImage))
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Create workload '%s' failed: %v\n", workloadName, err)
 				return err
 			}
 
 			err = device.WaitForWorkloadState(workloadName, "Running")
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "WaitForWorkloadState failed: %v\n", err)
 				return err
 			}
 

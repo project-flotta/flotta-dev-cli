@@ -36,19 +36,16 @@ func NewWorkloadCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			client, err := resources.NewClient()
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewClient failed: %v\n", err)
 				return err
 			}
 
 			workload, err := resources.NewEdgeWorkload(client)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "NewEdgeWorkload failed: %v\n", err)
 				return err
 			}
 
 			err = workload.Remove(workloadName)
 			if err != nil {
-				fmt.Fprintf(cmd.OutOrStderr(), "Remove workload failed: %v\n", err)
 				return err
 			}
 
