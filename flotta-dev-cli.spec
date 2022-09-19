@@ -1,6 +1,6 @@
 Name:       flotta-dev-cli
 Version:    0.2.0
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    CLI for flotta development
 ExclusiveArch: %{go_arches}
 Group:      Flotta
@@ -34,6 +34,10 @@ install -m 755 ./bin/flotta %{buildroot}%{_bindir}/flotta
 %{_bindir}/flotta
 
 %changelog
+* Mon Sep 19 2022 Moti Asayag <masayag@redhat.com> 0.2.0-4
+- Added support for edge device sets
+- Obtain device certificates from k8s cluster as part of add device
+
 * Sun Aug 7 2022 Moti Asayag <masayag@redhat.com> 0.2.0-4
 - Pin edgedevice image to a stable version
 
