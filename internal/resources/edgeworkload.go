@@ -17,6 +17,7 @@ type EdgeWorkload interface {
 	Get(string) (*v1alpha1.EdgeWorkload, error)
 	Remove(string) error
 	RemoveAll() error
+	List() (*v1alpha1.EdgeWorkloadList, error)
 }
 
 type edgeWorkload struct {
@@ -51,6 +52,10 @@ func (e *edgeWorkload) Remove(name string) error {
 		}
 		return false
 	})
+}
+
+func (e *edgeWorkload) List() (*v1alpha1.EdgeWorkloadList, error) {
+	return e.workload.EdgeWorkloads(Namespace).List(context.TODO(), metav1.ListOptions{})
 }
 
 func (e *edgeWorkload) waitForWorkload(cond func() bool) error {
