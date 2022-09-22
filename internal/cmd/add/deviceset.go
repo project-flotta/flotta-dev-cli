@@ -12,6 +12,7 @@ import (
 var (
 	deviceSetName    string
 	deviceSetSize    int
+	deviceImage      string
 	deviceNamePrefix string
 )
 
@@ -70,6 +71,7 @@ func NewDeviceSetCmd() *cobra.Command {
 	// define command flags
 	deviceSetCmd.Flags().StringVarP(&deviceSetName, "name", "n", "", "name of the deviceset to add")
 	deviceSetCmd.Flags().IntVarP(&deviceSetSize, "size", "s", 0, "the amount of edge devices to be created and added to the device set")
+	deviceSetCmd.Flags().StringVarP(&deviceImage, "image", "i", "", "image of edge devices to be created and added to the device set")
 	deviceSetCmd.Flags().StringVarP(&deviceNamePrefix, "prefix", "p", "", "the name prefix of the devices to add to the deviceset")
 
 	// mark name flag as required
@@ -98,7 +100,7 @@ func NewDeviceToSet(deviceSetName, deviceName string) error {
 		return err
 	}
 
-	err = device.Register()
+	err = device.Register(deviceImage)
 	if err != nil {
 		// if device.Register() failed, remove the container
 		err2 := device.Remove()

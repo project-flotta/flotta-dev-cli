@@ -54,7 +54,7 @@ func NewDeviceCmd() *cobra.Command {
 				}
 			}
 
-			err = device.Register()
+			err = device.Register(deviceImage)
 			if err != nil {
 				// if device.Register() failed, remove the container
 				err2 := device.Remove()
@@ -72,6 +72,9 @@ func NewDeviceCmd() *cobra.Command {
 
 	// define command flags
 	deviceCmd.Flags().StringVarP(&deviceName, "name", "n", "", "name of the device to add")
+	deviceCmd.Flags().StringVarP(&deviceImage, "image", "i", "", "image of the device to add")
+
+	// mark name flag as required
 	err := deviceCmd.MarkFlagRequired("name")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set flag `name` as required: %v\n", err)

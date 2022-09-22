@@ -47,7 +47,7 @@ var _ = Describe("Stop", func() {
 			device, err = resources.NewEdgeDevice(client, deviceName)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = device.Register()
+			err = device.Register("")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
