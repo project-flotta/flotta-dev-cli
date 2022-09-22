@@ -32,7 +32,6 @@ var (
 	clientCertPath = filepath.Join(certsPath, "cert.pem")
 	clientKeyPath  = filepath.Join(certsPath, "key.pem")
 	certificates   = []string{CACertsPath, clientKeyPath, clientCertPath}
-	certsMap       = make(map[string][]byte)
 )
 
 const (
@@ -186,7 +185,8 @@ func (e *edgeDevice) CopyCerts() error {
 	}
 	defer os.RemoveAll(dir) // clean up
 
-	err = CopyCertsToTempDir(dir)
+	certsMap := make(map[string][]byte)
+	err = CopyCertsToTempDir(dir, certsMap)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (e *edgeDevice) CopyCerts() error {
 	return nil
 }
 
-func CopyCertsToTempDir(dir string) error {
+func CopyCertsToTempDir(dir string, certsMap map[string][]byte) error {
 	// get secrets
 	config, err := GetKubeConfig()
 	if err != nil {
