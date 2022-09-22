@@ -44,7 +44,7 @@ const (
 
 type EdgeDevice interface {
 	GetName() string
-	Register(cmds ...string) error
+	Register(image string, cmds ...string) error
 	Unregister() error
 	Get() (*v1alpha1.EdgeDevice, error)
 	List() (*v1alpha1.EdgeDeviceList, error)
@@ -73,10 +73,9 @@ func (e *edgeDevice) GetName() string {
 	return e.name
 }
 
-func (e *edgeDevice) Register(cmds ...string) error {
-	image := EdgeDeviceImage
-	if name, exists := os.LookupEnv("DEVICE_IMAGE"); exists {
-		image = name
+func (e *edgeDevice) Register(image string, cmds ...string) error {
+	if image == "" {
+		image = EdgeDeviceImage
 	}
 	ctx := context.Background()
 	out, err := e.client.ImagePull(ctx, image, types.ImagePullOptions{})
