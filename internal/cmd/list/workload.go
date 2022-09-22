@@ -18,6 +18,7 @@ limitations under the License.
 
 import (
 	"fmt"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -39,6 +40,22 @@ func NewWorkloadCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			workload, err := resources.NewEdgeWorkload(client)
+			if err != nil {
+				return err
+			}
+
+			workloads, err := workload.List()
+			if err != nil {
+				return err
+			}
+
+			if len(workloads.Items) == 0 {
+				return fmt.Errorf("No resources were found.\n")
+			}
+
+			workloadsMap := make(map[string]string)
 
 			// create a list of all registered devices
 			device, err := resources.NewEdgeDevice(client, "")
@@ -72,19 +89,23 @@ func NewWorkloadCmd() *cobra.Command {
 						foundWorkload = true
 						fmt.Fprintf(writer, "%s\t%s\t%s\t\n", "NAME", "STATUS", "CREATED")
 					}
-					createdTime, err := getWorkloadCreationTime(workload.Name)
-					if err != nil {
-						return err
-					}
-					formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
-					fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workload.Phase, formattedTime)
+					workloadsMap[workload.Name] = string(workload.Phase)
 				}
 			}
 
-			// if there are no workloads, print a message
-			if !foundWorkload {
-				fmt.Fprintf(cmd.OutOrStderr(), "No resources were found.\n")
+			errWorkloads := make([]string, 0)
+			for _, workload := range workloads.Items {
+				createdTime := workload.CreationTimestamp.Time
+				formattedTime := units.HumanDuration(time.Now().UTC().Sub(createdTime)) + " ago"
+				if ok := workloadsMap[workload.Name]; ok != "" {
+					fmt.Fprintf(writer, "%s\t%v\t%s\t\n", workload.Name, workloadsMap[workload.Name], formattedTime)
+				} else {
+					errWorkloads = append(errWorkloads, workload.Name)
+				}
 			}
+
+			fmt.Fprintf(writer, "\nfailed to get device status for workloads: %v\n", strings.Join(errWorkloads, ", "))
+
 			return nil
 		},
 	}
@@ -95,23 +116,4 @@ func NewWorkloadCmd() *cobra.Command {
 func init() {
 	// subcommand of list
 	listCmd.AddCommand(NewWorkloadCmd())
-}
-
-func getWorkloadCreationTime(name string) (time.Time, error) {
-	client, err := resources.NewClient()
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	w, err := resources.NewEdgeWorkload(client)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	workload, err := w.Get(name)
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	return workload.CreationTimestamp.Time, nil
 }
